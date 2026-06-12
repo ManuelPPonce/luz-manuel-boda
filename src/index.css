@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-slate-700 font-sans antialiased;
+  }
+
+  ::selection {
+    background-color: rgba(141, 158, 111, 0.3);
+    color: #141E2E;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-xl border border-white/30 shadow-xl shadow-slate-900/5;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-olive-600 via-gold-400 to-olive-400;
+  }
+
+  .section-padding {
+    @apply py-20 md:py-32 px-4;
+  }
+}
+
+@layer utilities {
+  .perspective {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}

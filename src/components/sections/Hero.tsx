@@ -61,11 +61,6 @@ export function Hero() {
         </p>
 
         <div className="hero-cta mt-10 md:mt-14 flex flex-col md:flex-row items-center justify-center gap-4">
-          <a href="#gallery">
-            <Button variant="outline" size="lg" className="border-cream/30 text-cream hover:bg-cream/10">
-              Explorar invitación
-            </Button>
-          </a>
           <a href="/rsvp">
             <Button variant="primary" size="lg" className="bg-gold-600 hover:bg-gold-700 text-cream">
               Confirmar asistencia

@@ -29,7 +29,7 @@ export function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-800"
     >
       <div
-        className="absolute inset-0 bg-cover bg-[center_right_-2rem] md:bg-center"
+        className="absolute inset-0 bg-cover bg-[calc(50%+200px)_center] md:bg-center"
         style={{
           backgroundImage: 'url(/images/Hero.jpg)',
         }}

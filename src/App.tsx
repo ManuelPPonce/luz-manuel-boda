@@ -56,8 +56,6 @@ function MainContent() {
     const onVisibility = () => {
       if (document.hidden) {
         audio.pause();
-      } else if (letterOpened) {
-        audio.play().catch(() => {});
       }
     };
     document.addEventListener('visibilitychange', onVisibility);

@@ -15,7 +15,7 @@ export function FrameAnimation() {
       const img = new Image();
       img.onload = () => { loadedRef.current++; if (loadedRef.current === TOTAL) setReady(true); };
       img.onerror = () => { loadedRef.current++; if (loadedRef.current === TOTAL) setReady(true); };
-      img.src = `/images/frame/frame-${String(i).padStart(2, '0')}.jpg`;
+      img.src = `/images/frame/frame-${String(i).padStart(2, '0')}.webp`;
     }
   }, []);
 
@@ -47,7 +47,7 @@ export function FrameAnimation() {
             onMouseLeave={() => setPaused(false)}
           >
             <img
-              src={`/images/frame/frame-${String(frame).padStart(2, '0')}.jpg`}
+              src={`/images/frame/frame-${String(frame).padStart(2, '0')}.webp`}
               alt="Animación"
               className="w-full h-full object-cover pointer-events-none transition-opacity duration-300"
               draggable={false}

@@ -6,14 +6,14 @@ import { SectionTitle } from '../ui/SectionTitle';
 gsap.registerPlugin(ScrollTrigger);
 
 const IMAGES = [
-  { id: '1', src: '/images/galery/Luz&ManuelSavetheDate-29.jpg', alt: 'Foto 1', w: 600, h: 800 },
-  { id: '2', src: '/images/galery/Luz&ManuelSavetheDate-45.jpg', alt: 'Foto 2', w: 800, h: 600 },
-  { id: '3', src: '/images/galery/Luz&ManuelSavetheDate-57.jpg', alt: 'Foto 3', w: 600, h: 600 },
-  { id: '4', src: '/images/galery/Luz&ManuelSavetheDate-65.jpg', alt: 'Foto 4', w: 800, h: 700 },
-  { id: '5', src: '/images/galery/Luz&ManuelSavetheDate-70.jpg', alt: 'Foto 5', w: 600, h: 900 },
-  { id: '6', src: '/images/galery/Luz&ManuelSavetheDate-71.jpg', alt: 'Foto 6', w: 800, h: 600 },
-  { id: '7', src: '/images/galery/Luz&ManuelSavetheDate-77.jpg', alt: 'Foto 7', w: 700, h: 600 },
-  { id: '8', src: '/images/galery/Luz&ManuelSavetheDate-83.jpg', alt: 'Foto 8', w: 600, h: 700 },
+  { id: '1', src: '/images/galery/Luz&ManuelSavetheDate-29.webp', alt: 'Foto 1', w: 600, h: 800 },
+  { id: '2', src: '/images/galery/Luz&ManuelSavetheDate-45.webp', alt: 'Foto 2', w: 800, h: 600 },
+  { id: '3', src: '/images/galery/Luz&ManuelSavetheDate-57.webp', alt: 'Foto 3', w: 600, h: 600 },
+  { id: '4', src: '/images/galery/Luz&ManuelSavetheDate-65.webp', alt: 'Foto 4', w: 800, h: 700 },
+  { id: '5', src: '/images/galery/Luz&ManuelSavetheDate-70.webp', alt: 'Foto 5', w: 600, h: 900 },
+  { id: '6', src: '/images/galery/Luz&ManuelSavetheDate-71.webp', alt: 'Foto 6', w: 800, h: 600 },
+  { id: '7', src: '/images/galery/Luz&ManuelSavetheDate-77.webp', alt: 'Foto 7', w: 700, h: 600 },
+  { id: '8', src: '/images/galery/Luz&ManuelSavetheDate-83.webp', alt: 'Foto 8', w: 600, h: 700 },
 ];
 
 export function Gallery() {

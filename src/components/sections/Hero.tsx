@@ -28,12 +28,16 @@ export function Hero() {
       ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-800"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-[calc(50%+200px)_center] md:bg-center"
-        style={{
-          backgroundImage: 'url(/images/Hero.jpg)',
-        }}
-      />
+      <div className="absolute inset-0">
+        <picture className="absolute inset-0">
+          <source media="(min-width: 768px)" srcSet="/images/hero.webp" />
+          <img
+            src="/images/hero-mobile.webp"
+            alt="Luz & Manuel"
+            className="w-full h-full object-cover object-[calc(50%+200px)_center] md:object-center"
+          />
+        </picture>
+      </div>
       <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-900/85 via-slate-900/70 to-slate-900/90" />
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">

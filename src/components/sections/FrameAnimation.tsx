@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TOTAL = 5;
-const INTERVAL_MS = 2500;
+const INTERVAL_MS = 1500;
 
 export function FrameAnimation() {
   const [frame, setFrame] = useState(1);
@@ -39,8 +39,9 @@ export function FrameAnimation() {
           </h2>
         </div>
 
-        <div className="w-full max-w-3xl mx-auto translate-x-[200px]">
-          <div className="relative w-full rounded-sm overflow-hidden shadow-xl bg-olive-100 select-none"
+        <div className="w-full max-w-3xl mx-auto">
+          <div
+            className="relative w-full rounded-sm overflow-hidden shadow-xl bg-olive-100 select-none"
             style={{ aspectRatio: '4 / 3' }}
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
@@ -51,30 +52,6 @@ export function FrameAnimation() {
               className="w-full h-full object-cover pointer-events-none transition-opacity duration-300"
               draggable={false}
             />
-          </div>
-        </div>
-
-        <div className="max-w-xl mx-auto mt-4 md:mt-6 px-2">
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 font-mono w-4 text-right">{frame}</span>
-            <div className="flex-1 relative h-2">
-              <div className="absolute inset-0 bg-olive-200 rounded-full" />
-              <div className="absolute top-0 left-0 h-full bg-olive-500 rounded-full transition-all duration-300" style={{ width: `${(frame / TOTAL) * 100}%` }} />
-              <input type="range" min={1} max={TOTAL} value={frame}
-                onChange={(e) => { setPaused(true); setFrame(Number(e.target.value)); }}
-                onMouseUp={() => setPaused(false)}
-                onTouchEnd={() => setPaused(false)}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-            </div>
-            <span className="text-xs text-slate-400 font-mono w-4">{TOTAL}</span>
-          </div>
-          <div className="flex justify-center gap-2 mt-3">
-            {Array.from({ length: TOTAL }, (_, i) => (
-              <button key={i} onClick={() => { setPaused(true); setFrame(i + 1); setTimeout(() => setPaused(false), INTERVAL_MS); }}
-                className={`rounded-full transition-all duration-200 ${
-                  frame === i + 1 ? 'bg-olive-600 w-6 h-2' : 'bg-olive-200 hover:bg-olive-400 w-2 h-2'
-                }`} />
-            ))}
           </div>
         </div>
       </div>

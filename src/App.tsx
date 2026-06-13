@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Navbar } from './components/layout/Navbar';
-import { Particles } from './components/effects/Particles';
 import { MusicPlayer } from './components/effects/MusicPlayer';
 import { InvitationLetter } from './components/sections/InvitationLetter';
 import { Hero } from './components/sections/Hero';
@@ -78,7 +77,6 @@ function MainContent() {
           </p>
         </div>
       </footer>
-      {letterOpened && <Particles />}
       {letterOpened && <MusicPlayer />}
     </>
   );

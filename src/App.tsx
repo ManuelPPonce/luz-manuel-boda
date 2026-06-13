@@ -24,9 +24,7 @@ import { AdminCheckIn } from './pages/admin/AdminCheckIn';
 gsap.registerPlugin(ScrollTrigger);
 
 function MainContent() {
-  const [letterOpened, setLetterOpened] = useState(
-    () => localStorage.getItem('letter-opened') === 'true'
-  );
+  const [letterOpened, setLetterOpened] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [audioReady, setAudioReady] = useState(false);
@@ -93,7 +91,6 @@ function MainContent() {
   }
 
   function handleLetterOpen() {
-    localStorage.setItem('letter-opened', 'true');
     setLetterOpened(true);
     startAudio();
   }

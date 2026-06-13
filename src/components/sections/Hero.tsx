@@ -34,7 +34,7 @@ export function Hero() {
           <img
             src="/images/hero-mobile.webp"
             alt="Luz & Manuel"
-            className="w-full h-full object-cover object-[calc(50%+200px)_center] md:object-center"
+            className="w-full h-full object-cover object-center"
           />
         </picture>
       </div>

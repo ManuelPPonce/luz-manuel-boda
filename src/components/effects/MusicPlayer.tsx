@@ -1,74 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-const MUSIC_URL = '/music/playlist.mp3';
+interface MusicPlayerProps {
+  audioRef: React.RefObject<HTMLAudioElement | null>;
+}
 
-export function MusicPlayer() {
-  const audioRef = useRef<HTMLAudioElement>(null);
+export function MusicPlayer({ audioRef }: MusicPlayerProps) {
   const [playing, setPlaying] = useState(false);
 
-  useEffect(() => {
+  function toggle() {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.5;
-
-    const tryPlay = () => {
-      audio.play().then(() => setPlaying(true)).catch(() => {});
-    };
-
-    tryPlay();
-
-    const onInteraction = () => {
-      if (!audio.paused) return;
-      tryPlay();
-    };
-    document.addEventListener('click', onInteraction, { once: true });
-    document.addEventListener('touchstart', onInteraction, { once: true });
-    document.addEventListener('keydown', onInteraction, { once: true });
-
-    const onVisibility = () => {
-      if (!audio) return;
-      if (document.hidden) {
-        audio.pause();
-        setPlaying(false);
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      document.removeEventListener('click', onInteraction);
-      document.removeEventListener('touchstart', onInteraction);
-      document.removeEventListener('keydown', onInteraction);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, []);
-
-  function toggle() {
-    if (!audioRef.current) return;
     if (playing) {
-      audioRef.current.pause();
+      audio.pause();
     } else {
-      audioRef.current.play().catch(() => {});
+      audio.play().catch(() => {});
     }
     setPlaying(!playing);
   }
 
   return (
-    <>
-      <audio ref={audioRef} src={MUSIC_URL} loop preload="auto" />
-      <button
-        onClick={toggle}
-        className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-olive-600 text-cream shadow-lg hover:bg-olive-700 transition-all duration-300 flex items-center justify-center hover:scale-105 active:scale-95"
-        title={playing ? 'Pausar música' : 'Reproducir música'}
-      >
-        {playing ? (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
-        ) : (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        )}
-      </button>
-    </>
+    <button
+      onClick={toggle}
+      className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-olive-600 text-cream shadow-lg hover:bg-olive-700 transition-all duration-300 flex items-center justify-center hover:scale-105 active:scale-95"
+      title={playing ? 'Pausar música' : 'Reproducir música'}
+    >
+      {playing ? (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+      ) : (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      )}
+    </button>
   );
 }

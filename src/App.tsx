@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -27,6 +27,7 @@ function MainContent() {
   const [letterOpened, setLetterOpened] = useState(
     () => localStorage.getItem('letter-opened') === 'true'
   );
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
@@ -42,9 +43,37 @@ function MainContent() {
     return () => document.removeEventListener('click', smoothScroll);
   }, []);
 
+  useEffect(() => {
+    if (!letterOpened) return;
+    const timer = setTimeout(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [letterOpened]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onVisibility = () => {
+      if (document.hidden) {
+        audio.pause();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
   function handleLetterOpen() {
     localStorage.setItem('letter-opened', 'true');
     setLetterOpened(true);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    }
   }
 
   return (
@@ -77,7 +106,8 @@ function MainContent() {
           </p>
         </div>
       </footer>
-      {letterOpened && <MusicPlayer />}
+      {letterOpened && <MusicPlayer audioRef={audioRef} />}
+      <audio ref={audioRef} src="/music/playlist.mp3" loop preload="auto" />
     </>
   );
 }

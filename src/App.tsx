@@ -29,6 +29,8 @@ function MainContent() {
   );
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const [audioReady, setAudioReady] = useState(false);
+
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest('a[href^="#"]');
@@ -44,36 +46,56 @@ function MainContent() {
   }, []);
 
   useEffect(() => {
-    if (!letterOpened) return;
-    const timer = setTimeout(() => {
-      const audio = audioRef.current;
-      if (!audio) return;
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [letterOpened]);
-
-  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    audio.volume = 0.5;
+
+    const onCanPlay = () => setAudioReady(true);
+    audio.addEventListener('canplay', onCanPlay);
+    if (audio.readyState >= 3) setAudioReady(true);
+
     const onVisibility = () => {
       if (document.hidden) {
         audio.pause();
+      } else if (letterOpened) {
+        audio.play().catch(() => {});
       }
     };
     document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, []);
+
+    if (letterOpened) {
+      audio.play().catch(() => {});
+      const onInteraction = () => {
+        if (audio.paused) audio.play().catch(() => {});
+      };
+      document.addEventListener('click', onInteraction, { once: true });
+      document.addEventListener('touchstart', onInteraction, { once: true });
+      return () => {
+        audio.removeEventListener('canplay', onCanPlay);
+        document.removeEventListener('visibilitychange', onVisibility);
+        document.removeEventListener('click', onInteraction);
+        document.removeEventListener('touchstart', onInteraction);
+      };
+    }
+
+    return () => {
+      audio.removeEventListener('canplay', onCanPlay);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [letterOpened]);
+
+  function startAudio() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+  }
 
   function handleLetterOpen() {
     localStorage.setItem('letter-opened', 'true');
     setLetterOpened(true);
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
-    }
+    startAudio();
   }
 
   return (

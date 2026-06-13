@@ -34,16 +34,16 @@ export function Hero() {
           backgroundImage: 'url(/images/Hero.jpg)',
         }}
       />
-      <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/60 to-slate-900/90" />
+      <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/70" />
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <p className="hero-subtitle text-cream/60 text-sm md:text-base tracking-[0.3em] uppercase mb-8">
+        <p className="hero-subtitle text-cream/90 text-sm md:text-base tracking-[0.3em] uppercase mb-8 drop-shadow-lg">
           Nos casamos
         </p>
 
-        <h1 className="hero-names font-serif text-5xl md:text-7xl lg:text-9xl text-cream font-light tracking-[0.08em] leading-tight">
+        <h1 className="hero-names font-serif text-5xl md:text-7xl lg:text-9xl text-cream font-light tracking-[0.08em] leading-tight [text-shadow:0_2px_8px_rgba(0,0,0,0.5)]">
           <span className="block">Luz</span>
-          <span className="hero-ampersand block text-6xl md:text-8xl lg:text-[8rem] text-gold-400 font-script italic font-light my-2 md:my-4">
+          <span className="hero-ampersand block text-6xl md:text-8xl lg:text-[8rem] text-gold-300 font-script italic font-light my-2 md:my-4 drop-shadow-[0_0_12px_rgba(212,175,55,0.5)]">
             &amp;
           </span>
           <span className="block">Manuel</span>
@@ -51,12 +51,12 @@ export function Hero() {
 
         <div className="hero-date mt-8 md:mt-12">
           <div className="w-12 h-px bg-gold-400/40 mx-auto mb-6" />
-          <p className="text-cream/80 text-lg md:text-2xl tracking-[0.25em] uppercase font-light">
+          <p className="text-cream/95 text-lg md:text-2xl tracking-[0.25em] uppercase font-light drop-shadow-lg">
             18 de Julio, 2026
           </p>
         </div>
 
-        <p className="hero-location mt-4 text-cream/50 text-sm md:text-base tracking-[0.15em]">
+        <p className="hero-location mt-4 text-cream/80 text-sm md:text-base tracking-[0.15em] drop-shadow-lg">
           Holiday Inn Campeche
         </p>
 

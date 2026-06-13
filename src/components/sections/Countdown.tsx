@@ -19,14 +19,11 @@ export function Countdown() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(141,158,111,0.08)_0%,transparent_50%)]" />
 
       <div ref={ref} className="relative z-10 max-w-5xl mx-auto px-4 text-center">
-        <p className="text-olive-400/80 text-sm tracking-[0.3em] uppercase mb-2">
+        <p className="text-olive-400/80 text-sm tracking-[0.3em] uppercase mb-8">
           Faltan
         </p>
-        <h2 className="font-serif text-3xl md:text-5xl text-slate-700 font-light tracking-[0.08em] mb-12">
-          Para el gran día
-        </h2>
 
-        <div className="flex items-center justify-center gap-2 md:gap-4">
+        <div className="flex items-center justify-center gap-2 md:gap-4 mb-8">
           {units.map((unit, i) => (
             <div key={unit.key} className="flex items-center gap-2 md:gap-4">
               <div className="flex flex-col items-center">
@@ -54,6 +51,10 @@ export function Countdown() {
             </div>
           ))}
         </div>
+
+        <h2 className="font-serif text-3xl md:text-5xl text-slate-700 font-light tracking-[0.08em] mt-12">
+          Para el gran día
+        </h2>
       </div>
     </section>
   );

@@ -27,7 +27,7 @@ export function CalendarSection() {
           </div>
         ))}
 
-        {Array.from({ length: firstDay === 0 ? 6 : firstDay - 1 }).map((_, i) => (
+        {Array.from({ length: firstDay }).map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
 

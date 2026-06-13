@@ -52,7 +52,7 @@ export function InvitationLetter({ onOpen }: InvitationLetterProps) {
                 </p>
               </div>
 
-              <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 transition-all duration-500 ${sealBroken ? 'scale-150 opacity-0' : ''}`}>
+              <div className={`absolute -bottom-10 left-1/2 -translate-x-1/2 transition-all duration-500 ${sealBroken ? 'scale-150 opacity-0' : ''}`}>
                 <div className="w-16 h-16 rounded-full bg-gold-500 flex items-center justify-center shadow-xl shadow-gold-900/30">
                   <span className="text-cream font-serif text-2xl font-bold">L</span>
                 </div>

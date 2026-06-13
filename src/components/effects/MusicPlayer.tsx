@@ -1,10 +1,18 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const MUSIC_URL = '/music/playlist.mp3';
 
 export function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = 0.5;
+    audioRef.current.play().then(() => {
+      setPlaying(true);
+    }).catch(() => {});
+  }, []);
 
   function toggle() {
     if (!audioRef.current) return;

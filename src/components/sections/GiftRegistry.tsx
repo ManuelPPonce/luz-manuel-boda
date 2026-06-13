@@ -34,7 +34,7 @@ export function GiftRegistry() {
         <SectionTitle>Mesa de Regalos</SectionTitle>
         <p className="text-center text-slate-500/70 -mt-8 mb-12 font-light text-sm md:text-base max-w-lg mx-auto">
           Tu presencia es nuestro mejor regalo, pero si deseas obsequiarnos algo,
-          aquí tienes las opciones.
+          aquí tienes algunas ideas.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">

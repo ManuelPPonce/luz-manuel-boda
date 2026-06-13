@@ -39,7 +39,7 @@ export function FrameAnimation() {
           </h2>
         </div>
 
-        <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto translate-x-[200px]">
           <div className="relative w-full rounded-sm overflow-hidden shadow-xl bg-olive-100 select-none"
             style={{ aspectRatio: '4 / 3' }}
             onMouseEnter={() => setPaused(true)}

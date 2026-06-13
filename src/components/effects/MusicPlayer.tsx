@@ -7,11 +7,28 @@ export function MusicPlayer() {
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.volume = 0.5;
-    audioRef.current.play().then(() => {
-      setPlaying(true);
-    }).catch(() => {});
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = 0.5;
+
+    const tryPlay = () => {
+      audio.play().then(() => setPlaying(true)).catch(() => {});
+    };
+
+    tryPlay();
+
+    const onInteraction = () => {
+      if (!audio.paused) return;
+      tryPlay();
+    };
+    document.addEventListener('click', onInteraction, { once: true });
+    document.addEventListener('touchstart', onInteraction, { once: true });
+    document.addEventListener('keydown', onInteraction, { once: true });
+    return () => {
+      document.removeEventListener('click', onInteraction);
+      document.removeEventListener('touchstart', onInteraction);
+      document.removeEventListener('keydown', onInteraction);
+    };
   }, []);
 
   function toggle() {

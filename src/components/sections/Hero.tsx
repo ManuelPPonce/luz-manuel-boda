@@ -34,7 +34,7 @@ export function Hero() {
           backgroundImage: 'url(/images/Hero.jpg)',
         }}
       />
-      <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/70" />
+      <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-900/85 via-slate-900/70 to-slate-900/90" />
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <p className="hero-subtitle text-cream/90 text-sm md:text-base tracking-[0.3em] uppercase mb-8 drop-shadow-lg">

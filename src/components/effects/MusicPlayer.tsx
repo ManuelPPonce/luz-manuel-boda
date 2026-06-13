@@ -24,10 +24,20 @@ export function MusicPlayer() {
     document.addEventListener('click', onInteraction, { once: true });
     document.addEventListener('touchstart', onInteraction, { once: true });
     document.addEventListener('keydown', onInteraction, { once: true });
+
+    const onVisibility = () => {
+      if (!audio) return;
+      if (document.hidden) {
+        audio.pause();
+        setPlaying(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       document.removeEventListener('click', onInteraction);
       document.removeEventListener('touchstart', onInteraction);
       document.removeEventListener('keydown', onInteraction);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
 

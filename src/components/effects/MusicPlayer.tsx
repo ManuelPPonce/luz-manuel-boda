@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface MusicPlayerProps {
   audioRef: React.RefObject<HTMLAudioElement | null>;
@@ -7,15 +7,31 @@ interface MusicPlayerProps {
 export function MusicPlayer({ audioRef }: MusicPlayerProps) {
   const [playing, setPlaying] = useState(false);
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+
+    setPlaying(!audio.paused);
+
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+    };
+  }, [audioRef]);
+
   function toggle() {
     const audio = audioRef.current;
     if (!audio) return;
-    if (playing) {
-      audio.pause();
-    } else {
+    if (audio.paused) {
       audio.play().catch(() => {});
+    } else {
+      audio.pause();
     }
-    setPlaying(!playing);
   }
 
   return (

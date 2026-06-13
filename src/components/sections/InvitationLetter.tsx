@@ -4,166 +4,93 @@ interface InvitationLetterProps {
   onOpen: () => void;
 }
 
-type Phase = 'closed' | 'opening' | 'opened';
+type Phase = 'closed' | 'unsealing' | 'opening' | 'opened';
 
 export function InvitationLetter({ onOpen }: InvitationLetterProps) {
   const [phase, setPhase] = useState<Phase>('closed');
 
   function handleOpen() {
     if (phase !== 'closed') return;
-    setPhase('opening');
+    setPhase('unsealing');
+    setTimeout(() => setPhase('opening'), 500);
     setTimeout(() => {
       setPhase('opened');
-      setTimeout(onOpen, 600);
-    }, 2400);
+      setTimeout(onOpen, 400);
+    }, 1300);
   }
 
   if (phase === 'opened') return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-colors duration-1000 ${
-        phase === 'opening' ? 'bg-[#f5f0e8]' : 'bg-[#1a1510]'
-      }`}
-      onClick={phase === 'closed' ? handleOpen : undefined}
-    >
+    <div className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-colors duration-1000 ${phase === 'opening' ? 'bg-[#f5f0e8]' : 'bg-[#1a1510]'}`}>
       <div className={`absolute inset-0 transition-opacity duration-1000 ${phase === 'opening' ? 'opacity-0' : 'opacity-100'}`}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.06)_0%,transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(141,158,111,0.05)_0%,transparent_70%)]" />
       </div>
 
-      <div className="relative preserve-3d" style={{ perspective: '1200px' }}>
-        {/* Envelope */}
+      <div className="relative cursor-pointer perspective" onClick={handleOpen}>
         <div
-          className={`relative transition-all duration-700 ${
-            phase === 'opening' ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100'
-          }`}
+          className={`relative preserve-3d transition-all duration-700 ease-out ${
+            phase === 'unsealing' ? 'scale-95' : 'scale-100'
+          } ${phase === 'opening' ? 'scale-105 opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
-          {/* Envelope flap */}
-          <div
-            className={`absolute top-0 left-0 right-0 z-20 origin-top transition-transform duration-700 ease-in-out ${
-              phase === 'opening' ? 'rotate-x-[-160deg]' : 'rotate-x-0'
-            }`}
-            style={{ transformStyle: 'preserve-3d' }}
-          >
-            <div
-              className="w-[300px] h-[70px] md:w-[380px] md:h-[80px] mx-auto"
-              style={{
-                clipPath: 'polygon(0% 100%, 50% 0%, 100% 100%)',
-                background: 'linear-gradient(180deg, #c4a44a 0%, #a88830 100%)',
-              }}
-            />
-            <div
-              className="absolute -bottom-[2px] left-0 right-0 h-[3px]"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.15) 70%, transparent 100%)',
-              }}
-            />
-          </div>
+          <div className="relative w-[300px] md:w-[400px]">
+            <div className="relative bg-gradient-to-br from-[#4a5e2a] to-[#2d3b17] rounded-sm p-8 md:p-10 shadow-2xl border border-[#6b8a3a]/20">
+              <div className="absolute inset-0 opacity-[0.02] overflow-hidden rounded-sm">
+                <div className="w-full h-full" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.08) 15px, rgba(255,255,255,0.08) 16px)' }} />
+              </div>
 
-          {/* Envelope body */}
-          <div className="relative w-[300px] md:w-[380px] mx-auto">
-            {/* Back of envelope (visible above flap area) */}
-            <div
-              className="w-full h-[50px] md:h-[60px]"
-              style={{
-                background: 'linear-gradient(180deg, #d4bc6a 0%, #c4a44a 100%)',
-                clipPath: 'polygon(0% 0%, 50% 100%, 100% 0%)',
-              }}
-            />
+              <div className={`relative text-center transition-all duration-500 ${phase === 'opening' ? 'opacity-0 blur-sm' : 'opacity-100 blur-0'}`}>
+                <div className="mb-6">
+                  <div className="w-10 h-px bg-gold-400/30 mx-auto mb-3" />
+                  <span className="text-gold-300/70 text-[11px] tracking-[0.35em] uppercase">Invitación</span>
+                  <div className="w-10 h-px bg-gold-400/30 mx-auto mt-3" />
+                </div>
 
-            {/* Main envelope body */}
-            <div
-              className="w-full h-[220px] md:h-[280px] relative"
-              style={{
-                background: 'linear-gradient(180deg, #c4a44a 0%, #b89430 40%, #a88830 100%)',
-                borderRadius: '0 0 4px 4px',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-              }}
-            >
-              {/* Envelope inner shadow */}
-              <div className="absolute inset-0" style={{
-                background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.1) 100%)',
-                borderRadius: '0 0 4px 4px',
-              }} />
-
-              {/* Seal */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div
-                  className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all duration-500 ${
-                    phase === 'opening' ? 'scale-[3] opacity-0' : 'scale-100 opacity-100'
-                  }`}
-                  style={{
-                    background: 'linear-gradient(135deg, #d4a020 0%, #b8860b 50%, #8b6508 100%)',
-                    boxShadow: '0 4px 20px rgba(139, 101, 8, 0.5), 0 0 0 3px rgba(168, 136, 48, 0.2)',
-                  }}
-                >
-                  <span className="text-cream font-serif text-xl md:text-2xl font-bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
-                    L
+                <div className={`transition-all duration-500 ${phase === 'opening' ? 'translate-y-[-8px]' : ''}`}>
+                  <h2 className="font-serif text-cream text-3xl md:text-4xl font-light tracking-[0.08em] mb-2">
+                    Luz
+                  </h2>
+                  <span className="inline-block font-script text-gold-300 text-2xl md:text-3xl italic my-1">
+                    &amp;
                   </span>
+                  <h2 className="font-serif text-cream text-3xl md:text-4xl font-light tracking-[0.08em] mt-2 mb-6">
+                    Manuel
+                  </h2>
+                </div>
+
+                <p className="text-cream/50 text-[11px] tracking-[0.25em] uppercase mb-5">18 de Julio, 2026</p>
+                <div className="w-8 h-px bg-gold-400/25 mx-auto mb-5" />
+                <p className="text-cream/35 text-[10px] tracking-[0.2em] uppercase leading-relaxed">
+                  Tocan la puerta...<br />es el amor que llega para quedarse
+                </p>
+              </div>
+
+              <div className={`absolute -bottom-7 left-1/2 -translate-x-1/2 transition-all duration-500 ${
+                phase === 'unsealing' ? 'scale-[2] opacity-0' :
+                phase === 'opening' ? 'scale-150 opacity-0' :
+                'scale-100 opacity-100'
+              }`}>
+                <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-xl shadow-gold-900/40 transition-all duration-300 ${
+                  phase === 'unsealing' ? 'shadow-gold-400/60 shadow-2xl' : ''
+                }`}>
+                  <span className="text-cream font-serif text-2xl font-bold drop-shadow-sm">L</span>
                 </div>
               </div>
 
-              {/* "Toca para abrir" text */}
-              <div className={`absolute -bottom-10 left-1/2 -translate-x-1/2 transition-all duration-500 ${
-                phase === 'opening' ? 'opacity-0' : 'opacity-100'
+              <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ${
+                phase === 'opening' ? 'opacity-100' : 'opacity-0'
               }`}>
-                <p className="text-[#a88830]/40 text-[10px] tracking-[0.2em] uppercase animate-pulse-soft whitespace-nowrap">
-                  Toca para abrir
-                </p>
+                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-gold-400/80 to-transparent transition-transform duration-500 ease-out origin-center" style={{ transform: phase === 'opening' ? 'scaleX(1)' : 'scaleX(0)' }} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Letter coming out */}
-        <div
-          className={`absolute top-0 left-0 right-0 z-30 transition-all duration-800 ease-out ${
-            phase === 'opening' ? 'translate-y-[-60%] opacity-100' : 'translate-y-0 opacity-0 pointer-events-none'
-          }`}
-          style={{ transitionDelay: phase === 'opening' ? '700ms' : '0ms' }}
-        >
-          <div className="w-[280px] md:w-[360px] mx-auto bg-[#fdfaf5] rounded-sm shadow-2xl p-6 md:p-8 relative"
-            style={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)',
-            }}
-          >
-            {/* Paper texture */}
-            <div className="absolute inset-0 opacity-[0.03] rounded-sm" style={{
-              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px)',
-            }} />
-
-            <div className="relative text-center">
-              <div className="mb-4">
-                <div className="w-10 h-px bg-[#c4a44a]/30 mx-auto mb-3" />
-                <span className="text-[#8b7355] text-[11px] tracking-[0.3em] uppercase">Invitación</span>
-                <div className="w-10 h-px bg-[#c4a44a]/30 mx-auto mt-3" />
-              </div>
-
-              <h2 className="font-serif text-[#3d3226] text-2xl md:text-3xl font-light tracking-[0.08em] mb-1">
-                Luz
-              </h2>
-              <span className="inline-block font-script text-[#c4a44a] text-xl md:text-2xl italic my-1">
-                &amp;
-              </span>
-              <h2 className="font-serif text-[#3d3226] text-2xl md:text-3xl font-light tracking-[0.08em] mt-1 mb-4">
-                Manuel
-              </h2>
-
-              <p className="text-[#8b7355]/60 text-[11px] tracking-[0.2em] uppercase mb-4">
-                18 de Julio, 2026
-              </p>
-              <div className="w-8 h-px bg-[#c4a44a]/20 mx-auto mb-4" />
-              <p className="text-[#8b7355]/40 text-[10px] tracking-[0.15em] uppercase leading-relaxed">
-                Tocan la puerta...<br />es el amor que llega para quedarse
-              </p>
-            </div>
-
-            {/* Decorative corners */}
-            <div className="absolute top-2 left-2 w-3 h-3 border-t border-l border-[#c4a44a]/20" />
-            <div className="absolute top-2 right-2 w-3 h-3 border-t border-r border-[#c4a44a]/20" />
-            <div className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-[#c4a44a]/20" />
-            <div className="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-[#c4a44a]/20" />
-          </div>
+        <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 text-center transition-all duration-500 ${
+          phase !== 'closed' ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+        }`}>
+          <p className="text-cream/25 text-[10px] tracking-[0.2em] uppercase animate-pulse-soft">Toca para abrir</p>
         </div>
       </div>
     </div>

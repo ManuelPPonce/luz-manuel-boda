@@ -1,19 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Play } from 'lucide-react';
 import { Navbar } from './components/layout/Navbar';
 import { MusicPlayer } from './components/effects/MusicPlayer';
-import { InvitationLetter } from './components/sections/InvitationLetter';
+import { EditorialInvitation } from './components/sections/EditorialInvitation';
 import { Hero } from './components/sections/Hero';
-import { Countdown } from './components/sections/Countdown';
-import { CalendarSection } from './components/sections/CalendarSection';
-
-import { Gallery } from './components/sections/Gallery';
-import { FrameAnimation } from './components/sections/FrameAnimation';
-import { EventInfo } from './components/sections/EventInfo';
-
-import { GiftRegistry } from './components/sections/GiftRegistry';
+import { IntroVideo } from './components/sections/IntroVideo';
 import { RSVPPage } from './pages/RSVPPage';
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -24,10 +18,36 @@ import { AdminCheckIn } from './pages/admin/AdminCheckIn';
 gsap.registerPlugin(ScrollTrigger);
 
 function MainContent() {
-  const [letterOpened, setLetterOpened] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const resumeAfterReturnRef = useRef(false);
+  const [introOpen, setIntroOpen] = useState(true);
+  const [introKey, setIntroKey] = useState(0);
 
-  const [audioReady, setAudioReady] = useState(false);
+  const playMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || document.hidden) return;
+
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+  }, []);
+
+  const pauseMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+  }, []);
+
+  const closeIntro = useCallback(() => {
+    playMusic();
+    setIntroOpen(false);
+  }, [playMusic]);
+
+  const replayIntro = useCallback(() => {
+    pauseMusic();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIntroKey((current) => current + 1);
+    setIntroOpen(true);
+  }, [pauseMusic]);
 
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
@@ -49,81 +69,91 @@ function MainContent() {
 
     audio.volume = 0.5;
 
-    const onCanPlay = () => setAudioReady(true);
-    audio.addEventListener('canplay', onCanPlay);
-    if (audio.readyState >= 3) setAudioReady(true);
+    const pauseForBackground = () => {
+      resumeAfterReturnRef.current = !audio.paused;
+      audio.pause();
+    };
+
+    const resumeIfNeeded = () => {
+      if (!resumeAfterReturnRef.current || document.hidden) return;
+      resumeAfterReturnRef.current = false;
+      playMusic();
+    };
 
     const onVisibility = () => {
       if (document.hidden) {
-        audio.pause();
+        pauseForBackground();
+      } else {
+        resumeIfNeeded();
       }
     };
-    document.addEventListener('visibilitychange', onVisibility);
 
-    if (letterOpened) {
-      audio.play().catch(() => {});
-      const onInteraction = () => {
-        if (audio.paused) audio.play().catch(() => {});
-      };
-      document.addEventListener('click', onInteraction, { once: true });
-      document.addEventListener('touchstart', onInteraction, { once: true });
-      return () => {
-        audio.removeEventListener('canplay', onCanPlay);
-        document.removeEventListener('visibilitychange', onVisibility);
-        document.removeEventListener('click', onInteraction);
-        document.removeEventListener('touchstart', onInteraction);
-      };
-    }
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', pauseForBackground);
 
     return () => {
-      audio.removeEventListener('canplay', onCanPlay);
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', pauseForBackground);
     };
-  }, [letterOpened]);
+  }, [playMusic]);
 
-  function startAudio() {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.volume = 0.5;
-    audio.play().catch(() => {});
-  }
+  useEffect(() => {
+    if (introOpen) return;
 
-  function handleLetterOpen() {
-    setLetterOpened(true);
-    startAudio();
-  }
+    const startOnInteraction = () => playMusic();
+    document.addEventListener('pointerdown', startOnInteraction, { once: true });
+    document.addEventListener('keydown', startOnInteraction, { once: true });
+    document.addEventListener('touchstart', startOnInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('pointerdown', startOnInteraction);
+      document.removeEventListener('keydown', startOnInteraction);
+      document.removeEventListener('touchstart', startOnInteraction);
+    };
+  }, [introOpen, playMusic]);
+
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+      setIntroKey((current) => current + 1);
+      setIntroOpen(true);
+    };
+
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   return (
     <>
-      {!letterOpened && <InvitationLetter onOpen={handleLetterOpen} />}
-      <Navbar />
-      <main>
-        <Hero />
-        <section className="py-24 md:py-32 bg-cream overflow-hidden">
-          <div className="max-w-6xl mx-auto px-4 text-center">
-            <p className="text-olive-400/80 text-sm tracking-[0.3em] uppercase mb-8">La fecha</p>
-            <h2 className="font-serif text-3xl md:text-5xl text-slate-700 font-light tracking-[0.08em] mb-12">
-              {new Intl.DateTimeFormat('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(2026, 6, 18))}
-            </h2>
-            <div className="flex justify-center">
-              <CalendarSection />
+      {introOpen && <IntroVideo key={introKey} onComplete={closeIntro} />}
+      {!introOpen && (
+        <>
+          <Navbar />
+          <main>
+            <Hero key={introKey} />
+            <EditorialInvitation />
+          </main>
+          <footer className="border-t border-cream/20 bg-[#667150] py-6 text-center">
+            <div className="mx-auto max-w-md px-4">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-cream">
+                &copy; {new Date().getFullYear()} Luz &amp; Manuel
+              </p>
             </div>
-          </div>
-        </section>
-        <Countdown />
-        <FrameAnimation />
-        <Gallery />
-        <EventInfo />
-        <GiftRegistry />
-      </main>
-      <footer className="py-6 bg-olive-700 border-t border-olive-600/30 text-center">
-        <div className="max-w-md mx-auto px-4">
-          <p className="text-cream/50 text-[10px] tracking-[0.15em] uppercase">
-            &copy; {new Date().getFullYear()} Luz &amp; Manuel
-          </p>
-        </div>
-      </footer>
-      {letterOpened && <MusicPlayer audioRef={audioRef} />}
+          </footer>
+          <MusicPlayer audioRef={audioRef} />
+        </>
+      )}
+      {!introOpen && (
+        <button
+          type="button"
+          onClick={replayIntro}
+          className="fixed bottom-6 left-6 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-white/88 px-4 text-[10px] uppercase tracking-[0.16em] text-olive-800 shadow-lg backdrop-blur transition hover:bg-white hover:shadow-xl"
+          title="Volver a ver la intro"
+        >
+          <Play className="h-4 w-4" aria-hidden="true" />
+          Intro
+        </button>
+      )}
       <audio ref={audioRef} src="/music/playlist.mp3" loop preload="auto" />
     </>
   );

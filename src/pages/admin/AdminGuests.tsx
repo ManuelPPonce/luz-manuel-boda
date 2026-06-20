@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/Button';
 import {
   deleteConfirmedGuest,
   deletePreGuest,
-  getConfirmedGuests,
+  getAllGuests,
   getPreGuests,
   getTables,
   saveConfirmedGuest,
@@ -13,10 +13,13 @@ import {
 } from '../../data';
 import type { PreGuest, TableData } from '../../types';
 
+type AdminGuest = PreGuest & { canceled?: boolean };
+
 export function AdminGuests() {
-  const [preGuests, setPreGuests] = useState<PreGuest[]>([]);
+  const [preGuests, setPreGuests] = useState<AdminGuest[]>([]);
   const [tables, setTables] = useState<TableData[]>([]);
-  const [confirmedCount, setConfirmedCount] = useState(0);
+  const [confirmedPeople, setConfirmedPeople] = useState(0);
+  const [canceledPeople, setCanceledPeople] = useState(0);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -35,7 +38,7 @@ export function AdminGuests() {
       const searchable = [
         guest.name,
         String(guest.tableNumber || ''),
-        guest.confirmed ? 'confirmo confirmado' : 'invitado pendiente',
+        guest.canceled ? 'cancelo cancelado' : guest.confirmed ? 'confirmo confirmado' : 'invitado pendiente',
         ...(guest.companionNames || []),
       ].join(' ').toLowerCase();
 
@@ -53,11 +56,15 @@ export function AdminGuests() {
   }, [navigate]);
 
   async function refresh() {
-    const [guests, confirmed, tableList] = await Promise.all([getPreGuests(), getConfirmedGuests(), getTables()]);
-    const confirmedIds = new Set(confirmed.map((guest) => guest.id));
-    setPreGuests(guests.map((guest) => ({ ...guest, confirmed: confirmedIds.has(guest.id) })));
+    const [guests, allGuests, tableList] = await Promise.all([getPreGuests(), getAllGuests(), getTables()]);
+    const statusMap = new Map(allGuests.map((guest) => [guest.id, guest]));
+    setPreGuests(guests.map((guest) => {
+      const status = statusMap.get(guest.id);
+      return { ...guest, confirmed: !!status?.confirmed, canceled: !!status?.canceled };
+    }));
     setTables(tableList);
-    setConfirmedCount(confirmed.length);
+    setConfirmedPeople(allGuests.filter((guest) => guest.confirmed).reduce((sum, guest) => sum + guest.guests + 1, 0));
+    setCanceledPeople(allGuests.filter((guest) => guest.canceled).reduce((sum, guest) => sum + guest.guests + 1, 0));
   }
 
   function resetFormFields() {
@@ -136,7 +143,7 @@ export function AdminGuests() {
     await refresh();
   }
 
-  async function toggleConfirmed(guest: PreGuest) {
+  async function toggleConfirmed(guest: AdminGuest) {
     if (guest.confirmed) {
       await deleteConfirmedGuest(guest.id);
       await updatePreGuest(guest.id, { confirmed: false });
@@ -170,7 +177,7 @@ export function AdminGuests() {
           <Link to="/admin/tables" className="text-[10px] uppercase tracking-[0.1em] text-slate-400 transition-colors hover:text-olive-600">
             Mesas
           </Link>
-          <span className="text-xs text-slate-400">{preGuests.length} invitados · {confirmedCount} confirmaron</span>
+          <span className="text-xs text-slate-400">{preGuests.length} invitados · {confirmedPeople} confirmaron · {canceledPeople} cancelaron</span>
         </div>
       </header>
 
@@ -232,9 +239,9 @@ export function AdminGuests() {
                         <td className="p-3 text-center">
                           <button
                             onClick={() => toggleConfirmed(guest)}
-                            className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}
+                            className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.canceled ? 'bg-rose-50 text-rose-500' : guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}
                           >
-                            {guest.confirmed ? 'Confirmó' : 'Invitado'}
+                            {guest.canceled ? 'Canceló' : guest.confirmed ? 'Confirmó' : 'Invitado'}
                           </button>
                         </td>
                         <td className="p-3 text-center">

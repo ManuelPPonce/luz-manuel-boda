@@ -126,14 +126,25 @@ function serializeConfirmedPayload(guest) {
 }
 
 const IMPORTED_CONFIRMATION_MESSAGE = 'Importado desde pre-invitaciones confirmadas';
+const CANCELED_CONFIRMATION_MESSAGE = 'Asistencia cancelada desde invitacion';
+
+function isCanceledConfirmation(guest) {
+  return guest.message === CANCELED_CONFIRMATION_MESSAGE;
+}
 
 function currentConfirmations(confirmed) {
-  return confirmed.filter(guest => guest.message !== IMPORTED_CONFIRMATION_MESSAGE);
+  return confirmed.filter(guest => guest.message !== IMPORTED_CONFIRMATION_MESSAGE && !isCanceledConfirmation(guest));
+}
+
+function currentCancellations(confirmed) {
+  return confirmed.filter(isCanceledConfirmation);
 }
 
 function combineGuests(preGuests, confirmed) {
   const activeConfirmed = currentConfirmations(confirmed);
+  const canceled = currentCancellations(confirmed);
   const confirmedMap = new Map(activeConfirmed.map(c => [c.id, c]));
+  const canceledMap = new Map(canceled.map(c => [c.id, c]));
   const result = preGuests.map(g => {
     const c = confirmedMap.get(g.id);
     return {
@@ -143,6 +154,7 @@ function combineGuests(preGuests, confirmed) {
       companionNames: g.companionNames || [],
       tableNumber: g.tableNumber,
       confirmed: confirmedMap.has(g.id),
+      canceled: canceledMap.has(g.id),
       checkedIn: c ? !!c.checkedIn : false,
       checkedInAt: c?.checkedInAt || '',
       email: c?.email || '',
@@ -162,8 +174,30 @@ function combineGuests(preGuests, confirmed) {
         companionNames: [],
         tableNumber: c.tableNumber,
         confirmed: true,
+        canceled: false,
         checkedIn: !!c.checkedIn,
         checkedInAt: c.checkedInAt || '',
+        email: c.email,
+        dietary: c.dietary,
+        message: c.message,
+        songs: c.songs,
+        confirmedAt: c.confirmedAt,
+      });
+    }
+  }
+
+  for (const c of canceled) {
+    if (!preGuests.find(p => p.id === c.id)) {
+      result.push({
+        id: c.id,
+        name: c.name,
+        guests: c.guests,
+        companionNames: [],
+        tableNumber: c.tableNumber,
+        confirmed: false,
+        canceled: true,
+        checkedIn: false,
+        checkedInAt: '',
         email: c.email,
         dietary: c.dietary,
         message: c.message,

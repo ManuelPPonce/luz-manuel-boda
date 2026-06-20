@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAllGuests, getTables } from '../../data';
 import type { CombinedGuest, TableData } from '../../types';
 
@@ -9,84 +9,125 @@ export function AdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!localStorage.getItem('wedding-admin')) { navigate('/admin'); return; }
-    (async () => { setGuests(await getAllGuests()); setTables(await getTables()); })();
+    if (!localStorage.getItem('wedding-admin')) {
+      navigate('/admin');
+      return;
+    }
+
+    (async () => {
+      setGuests(await getAllGuests());
+      setTables(await getTables());
+    })();
   }, [navigate]);
 
   const total = guests.length;
-  const totalPeople = guests.reduce((sum, g) => sum + g.guests + 1, 0);
-  const confirmed = guests.filter((g) => g.confirmed).length;
-  const checkedInPeople = guests.filter((g) => g.checkedIn).reduce((sum, g) => sum + g.guests + 1, 0);
+  const totalPeople = guests.reduce((sum, guest) => sum + guest.guests + 1, 0);
+  const confirmedPeople = guests.filter((guest) => guest.confirmed).reduce((sum, guest) => sum + guest.guests + 1, 0);
+  const canceledPeople = guests.filter((guest) => guest.canceled).reduce((sum, guest) => sum + guest.guests + 1, 0);
+  const checkedInPeople = guests.filter((guest) => guest.checkedIn).reduce((sum, guest) => sum + guest.guests + 1, 0);
   const tableCount = tables.length;
-  const allSongs = guests.filter(g => g.songs).filter(Boolean);
+  const allSongs = guests.filter((guest) => guest.songs);
 
-  function handleLogout() { localStorage.removeItem('wedding-admin'); navigate('/admin'); }
+  function handleLogout() {
+    localStorage.removeItem('wedding-admin');
+    navigate('/admin');
+  }
 
   const StatCard = ({ label, value, color }: { label: string; value: string | number; color: string }) => (
-    <div className="bg-white rounded-sm border border-olive-100 p-5 text-center shadow-sm">
-      <p className={`text-3xl font-serif ${color}`}>{value}</p>
-      <p className="text-slate-400 text-[10px] tracking-[0.15em] uppercase mt-1">{label}</p>
+    <div className="rounded-sm border border-olive-100 bg-white p-5 text-center shadow-sm">
+      <p className={`font-serif text-3xl ${color}`}>{value}</p>
+      <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-slate-400">{label}</p>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-cream">
-      <header className="bg-white border-b border-olive-100 px-4 py-4 flex items-center justify-between shadow-sm">
-        <div><h1 className="font-serif text-slate-700 text-xl">Panel Admin</h1><p className="text-slate-400 text-xs">Luz & Manuel</p></div>
+      <header className="flex items-center justify-between border-b border-olive-100 bg-white px-4 py-4 shadow-sm">
+        <div>
+          <h1 className="font-serif text-xl text-slate-700">Panel Admin</h1>
+          <p className="text-xs text-slate-400">Luz & Manuel</p>
+        </div>
         <div className="flex items-center gap-4">
-          <Link to="/" className="text-slate-400 text-[10px] tracking-[0.1em] uppercase hover:text-olive-600 transition-colors">Invitación</Link>
-          <button onClick={handleLogout} className="text-slate-400 text-[10px] tracking-[0.1em] uppercase hover:text-rose-500 transition-colors">Salir</button>
+          <Link to="/" className="text-[10px] uppercase tracking-[0.1em] text-slate-400 transition-colors hover:text-olive-600">Invitación</Link>
+          <button onClick={handleLogout} className="text-[10px] uppercase tracking-[0.1em] text-slate-400 transition-colors hover:text-rose-500">Salir</button>
         </div>
       </header>
-      <div className="max-w-5xl mx-auto p-4 md:p-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+      <div className="mx-auto max-w-5xl p-4 md:p-8">
+        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard label="Invitados" value={total} color="text-slate-700" />
           <StatCard label="Personas" value={totalPeople} color="text-olive-600" />
-          <StatCard label="Confirmados" value={confirmed} color="text-gold-600" />
-          <StatCard label="Llegaron" value={checkedInPeople} color="text-olive-600" />
+          <StatCard label="Confirmaron" value={confirmedPeople} color="text-gold-600" />
+          <StatCard label="Cancelaron" value={canceledPeople} color="text-rose-500" />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          <Link to="/admin/tables" className="bg-white border border-olive-100 rounded-sm p-4 text-center hover:shadow-md transition-shadow">
-            <p className="text-2xl font-serif text-olive-600">{tableCount}</p>
-            <p className="text-slate-400 text-[9px] tracking-[0.1em] uppercase mt-1">Mesas</p>
-            <p className="text-olive-600 text-[9px] tracking-[0.1em] uppercase mt-2 font-medium">Diseñar &rarr;</p>
+
+        <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <Link to="/admin/tables" className="rounded-sm border border-olive-100 bg-white p-4 text-center transition-shadow hover:shadow-md">
+            <p className="font-serif text-2xl text-olive-600">{tableCount}</p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-slate-400">Mesas</p>
+            <p className="mt-2 text-[9px] font-medium uppercase tracking-[0.1em] text-olive-600">Diseñar &rarr;</p>
           </Link>
-          <Link to="/admin/guests" className="bg-white border border-olive-100 rounded-sm p-4 text-center hover:shadow-md transition-shadow">
-            <p className="text-2xl font-serif text-slate-600">{total}</p>
-            <p className="text-slate-400 text-[9px] tracking-[0.1em] uppercase mt-1">Invitados</p>
-            <p className="text-olive-600 text-[9px] tracking-[0.1em] uppercase mt-2 font-medium">Gestionar &rarr;</p>
+          <Link to="/admin/guests" className="rounded-sm border border-olive-100 bg-white p-4 text-center transition-shadow hover:shadow-md">
+            <p className="font-serif text-2xl text-slate-600">{total}</p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-slate-400">Invitados</p>
+            <p className="mt-2 text-[9px] font-medium uppercase tracking-[0.1em] text-olive-600">Gestionar &rarr;</p>
           </Link>
-          <Link to="/admin/checkin" className="bg-white border border-olive-100 rounded-sm p-4 text-center hover:shadow-md transition-shadow col-span-2">
-            <p className="text-2xl font-serif text-slate-600">{checkedInPeople}/{totalPeople}</p>
-            <p className="text-slate-400 text-[9px] tracking-[0.1em] uppercase mt-1">Check-in en vivo</p>
-            <p className="text-olive-600 text-[9px] tracking-[0.1em] uppercase mt-2 font-medium">Abrir &rarr;</p>
+          <Link to="/admin/checkin" className="col-span-2 rounded-sm border border-olive-100 bg-white p-4 text-center transition-shadow hover:shadow-md">
+            <p className="font-serif text-2xl text-slate-600">{checkedInPeople}/{totalPeople}</p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-slate-400">Check-in en vivo</p>
+            <p className="mt-2 text-[9px] font-medium uppercase tracking-[0.1em] text-olive-600">Abrir &rarr;</p>
           </Link>
         </div>
-        <div className="bg-white rounded-sm border border-olive-100 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-olive-50"><h2 className="text-slate-500 text-xs tracking-[0.15em] uppercase">Últimos invitados</h2></div>
+
+        <div className="overflow-hidden rounded-sm border border-olive-100 bg-white shadow-sm">
+          <div className="border-b border-olive-50 p-4">
+            <h2 className="text-xs uppercase tracking-[0.15em] text-slate-500">Últimos invitados</h2>
+          </div>
           {guests.length === 0 ? (
-            <div className="p-8 text-center"><p className="text-slate-300 text-xs tracking-[0.15em] uppercase">No hay invitados registrados</p><Link to="/admin/guests" className="text-olive-600 text-xs mt-2 inline-block hover:underline">Agregar primero</Link></div>
+            <div className="p-8 text-center">
+              <p className="text-xs uppercase tracking-[0.15em] text-slate-300">No hay invitados registrados</p>
+              <Link to="/admin/guests" className="mt-2 inline-block text-xs text-olive-600 hover:underline">Agregar primero</Link>
+            </div>
           ) : (
             <div className="divide-y divide-olive-50">
               {[...guests].slice(0, 8).map((guest) => (
-                <div key={guest.id} className="p-3 md:p-4 flex items-center justify-between hover:bg-olive-50/30">
-                  <div><p className="text-slate-700 text-sm font-medium">{guest.name}</p><p className="text-slate-400 text-[10px]">{guest.guests > 0 ? `${guest.guests + 1} personas` : 'Solo'}{guest.tableNumber > 0 && ` · Mesa ${guest.tableNumber}`}</p></div>
+                <div key={guest.id} className="flex items-center justify-between p-3 hover:bg-olive-50/30 md:p-4">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">{guest.name}</p>
+                    <p className="text-[10px] text-slate-400">{guest.guests > 0 ? `${guest.guests + 1} personas` : 'Solo'}{guest.tableNumber > 0 && ` · Mesa ${guest.tableNumber}`}</p>
+                  </div>
                   <div className="flex gap-2">
-                    <span className={`text-[9px] tracking-[0.1em] uppercase px-2 py-1 rounded-sm ${guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>{guest.confirmed ? 'Confirmó' : 'Invitado'}</span>
-                    <span className={`text-[9px] tracking-[0.1em] uppercase px-2 py-1 rounded-sm ${guest.checkedIn ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>{guest.checkedIn ? 'Llegó' : 'Pendiente'}</span>
+                    <span className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.canceled ? 'bg-rose-50 text-rose-500' : guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>
+                      {guest.canceled ? 'Canceló' : guest.confirmed ? 'Confirmó' : 'Invitado'}
+                    </span>
+                    <span className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.checkedIn ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>
+                      {guest.checkedIn ? 'Llegó' : 'Pendiente'}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="mt-8 bg-white rounded-sm border border-olive-100 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-olive-50"><h2 className="text-slate-500 text-xs tracking-[0.15em] uppercase">&#127925; Canciones solicitadas</h2></div>
+
+        <div className="mt-8 overflow-hidden rounded-sm border border-olive-100 bg-white shadow-sm">
+          <div className="border-b border-olive-50 p-4">
+            <h2 className="text-xs uppercase tracking-[0.15em] text-slate-500">&#127925; Canciones solicitadas</h2>
+          </div>
           {allSongs.length === 0 ? (
-            <div className="p-6 text-center"><p className="text-slate-300 text-xs tracking-[0.15em] uppercase">Sin solicitudes aún</p></div>
+            <div className="p-6 text-center">
+              <p className="text-xs uppercase tracking-[0.15em] text-slate-300">Sin solicitudes aún</p>
+            </div>
           ) : (
             <div className="divide-y divide-olive-50">
-              {allSongs.map((g) => (<div key={g.id} className="p-3 flex items-center justify-between hover:bg-olive-50/30"><div><p className="text-slate-700 text-sm font-medium">{g.name}</p></div><span className="text-slate-500 text-xs italic">{g.songs}</span></div>))}
+              {allSongs.map((guest) => (
+                <div key={guest.id} className="flex items-center justify-between p-3 hover:bg-olive-50/30">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">{guest.name}</p>
+                  </div>
+                  <span className="text-xs italic text-slate-500">{guest.songs}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>

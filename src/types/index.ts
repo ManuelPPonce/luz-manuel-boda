@@ -89,6 +89,7 @@ export interface CombinedGuest {
   companionNames: string[];
   tableNumber: number;
   confirmed: boolean;
+  canceled: boolean;
   checkedIn: boolean;
   checkedInAt: string;
   email?: string;

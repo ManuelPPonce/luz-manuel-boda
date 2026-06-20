@@ -173,17 +173,28 @@ function confirmedGuestSupabasePayload(guest: Partial<ConfirmedGuest>): Record<s
 }
 
 const IMPORTED_CONFIRMATION_MESSAGE = 'Importado desde pre-invitaciones confirmadas';
+export const CANCELED_CONFIRMATION_MESSAGE = 'Asistencia cancelada desde invitacion';
+
+function isCanceledConfirmation(guest: ConfirmedGuest): boolean {
+  return guest.message === CANCELED_CONFIRMATION_MESSAGE;
+}
 
 function currentConfirmations(confirmed: ConfirmedGuest[]): ConfirmedGuest[] {
-  return confirmed.filter((guest) => guest.message !== IMPORTED_CONFIRMATION_MESSAGE);
+  return confirmed.filter((guest) => guest.message !== IMPORTED_CONFIRMATION_MESSAGE && !isCanceledConfirmation(guest));
+}
+
+function currentCancellations(confirmed: ConfirmedGuest[]): ConfirmedGuest[] {
+  return confirmed.filter(isCanceledConfirmation);
 }
 
 function combineGuests(pre: PreGuest[], confirmed: ConfirmedGuest[]): CombinedGuest[] {
   const activeConfirmed = currentConfirmations(confirmed);
+  const canceled = currentCancellations(confirmed);
   const confirmedMap = new Map(activeConfirmed.map(c => [c.id, c]));
+  const canceledMap = new Map(canceled.map(c => [c.id, c]));
   const result: CombinedGuest[] = pre.map(p => ({
     id: p.id, name: p.name, guests: p.guests, companionNames: p.companionNames || [],
-    tableNumber: p.tableNumber, confirmed: confirmedMap.has(p.id), checkedIn: confirmedMap.get(p.id)?.checkedIn || false,
+    tableNumber: p.tableNumber, confirmed: confirmedMap.has(p.id), canceled: canceledMap.has(p.id), checkedIn: confirmedMap.get(p.id)?.checkedIn || false,
     checkedInAt: confirmedMap.get(p.id)?.checkedInAt || '',
     email: confirmedMap.get(p.id)?.email || '', dietary: confirmedMap.get(p.id)?.dietary || '',
     message: confirmedMap.get(p.id)?.message || '', songs: confirmedMap.get(p.id)?.songs || '',
@@ -192,7 +203,13 @@ function combineGuests(pre: PreGuest[], confirmed: ConfirmedGuest[]): CombinedGu
 
   for (const c of activeConfirmed) {
     if (!pre.find(p => p.id === c.id)) {
-      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: true, checkedIn: !!c.checkedIn, checkedInAt: c.checkedInAt || '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
+      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: true, canceled: false, checkedIn: !!c.checkedIn, checkedInAt: c.checkedInAt || '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
+    }
+  }
+
+  for (const c of canceled) {
+    if (!pre.find(p => p.id === c.id)) {
+      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: false, canceled: true, checkedIn: false, checkedInAt: '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
     }
   }
 

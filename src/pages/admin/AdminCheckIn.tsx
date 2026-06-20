@@ -16,7 +16,7 @@ export function AdminCheckIn() {
   }, [navigate]);
 
   async function load() {
-    setGuests(await getAllGuests());
+    setGuests((await getAllGuests()).filter((guest) => !guest.canceled));
     setTables(await getTables());
   }
 

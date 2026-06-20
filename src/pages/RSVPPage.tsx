@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard';
 import { Button } from '../components/ui/Button';
-import { getPreGuests, getTables, saveConfirmedGuest, searchPreGuest, updatePreGuest } from '../data';
+import { CANCELED_CONFIRMATION_MESSAGE, getPreGuests, getTables, saveConfirmedGuest, searchPreGuest, updatePreGuest } from '../data';
 import type { TableData } from '../types';
 
 export function RSVPPage() {
@@ -19,6 +19,7 @@ export function RSVPPage() {
   const [companionNames, setCompanionNames] = useState<string[]>([]);
   const [companionAttendance, setCompanionAttendance] = useState<boolean[]>([]);
   const [message, setMessage] = useState('');
+  const [didCancel, setDidCancel] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const attendingCompanions = companionAttendance.filter(Boolean).length;
@@ -65,6 +66,7 @@ export function RSVPPage() {
       setGuestCount(pre.guests);
       setCompanionNames(pre.companionNames?.filter(Boolean) || []);
       setCompanionAttendance(Array.from({ length: pre.guests }, () => true));
+      setDidCancel(false);
 
       const tables = await getTables();
       setTableInfo(tables.find((t) => t.number === pre.tableNumber) || null);
@@ -80,6 +82,7 @@ export function RSVPPage() {
     setGuestCount(0);
     setCompanionNames([]);
     setCompanionAttendance([]);
+    setDidCancel(false);
     setSearchError('No encontramos ese nombre en la lista de invitados. Revisa que esté escrito igual a tu invitación.');
     setStep('search');
   }
@@ -124,45 +127,54 @@ export function RSVPPage() {
       checkedInAt: '',
     });
     await updatePreGuest(selectedGuestId, { confirmed: true });
+    setDidCancel(false);
     setStep('done');
   }
 
-  function resetForAnotherGuest() {
-    setStep('search');
-    setSearchName('');
-    setSearchError('');
-    setSelectedGuestId(null);
-    setName('');
-    setTableNumber(0);
-    setTableInfo(null);
-    setGuestCount(0);
-    setCompanionNames([]);
-    setCompanionAttendance([]);
-    setMessage('');
+  async function handleCancelAttendance() {
+    if (!selectedGuestId) {
+      setSearchError('Primero busca y selecciona tu nombre en la lista de invitados.');
+      setStep('search');
+      return;
+    }
+
+    await saveConfirmedGuest({
+      id: selectedGuestId,
+      name,
+      email: '',
+      guests: 0,
+      dietary: '',
+      message: CANCELED_CONFIRMATION_MESSAGE,
+      songs: '',
+      confirmedAt: new Date().toISOString(),
+      tableNumber,
+      checkedIn: false,
+      checkedInAt: '',
+    });
+    await updatePreGuest(selectedGuestId, { confirmed: false });
+    setDidCancel(true);
+    setStep('done');
   }
 
   if (step === 'done') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream p-4">
         <div className="w-full max-w-lg text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-olive-100">
-            <span className="text-4xl text-olive-600">&#10003;</span>
+          <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full ${didCancel ? 'bg-rose-50' : 'bg-olive-100'}`}>
+            <span className={`text-4xl ${didCancel ? 'text-rose-500' : 'text-olive-600'}`}>{didCancel ? '!' : '\u2713'}</span>
           </div>
-          <h2 className="mb-3 font-serif text-3xl font-light tracking-[0.05em] text-slate-700">Gracias, {name}</h2>
-          <p className="mb-6 text-slate-500/70">Te esperamos con mucho cariño.</p>
-          {tableNumber > 0 && (
+          <h2 className="mb-3 font-serif text-3xl font-light tracking-[0.05em] text-slate-700">{didCancel ? `Gracias por avisarnos, ${name}` : `Gracias, ${name}`}</h2>
+          <p className="mb-6 text-slate-500/70">{didCancel ? 'Registramos que no podrás asistir.' : 'Te esperamos con mucho cariño.'}</p>
+          {!didCancel && tableNumber > 0 && (
             <div className="mb-6 inline-block rounded-sm border border-olive-100 bg-white px-6 py-3 shadow-sm">
               <p className="text-[9px] uppercase tracking-[0.15em] text-slate-400">Tu mesa</p>
               <p className="font-serif text-3xl text-olive-600">{tableNumber}</p>
             </div>
           )}
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center">
             <Link to="/" className="rounded-sm border border-olive-200 px-6 py-3 text-xs uppercase tracking-[0.12em] text-olive-600 transition-colors hover:bg-olive-50">
               Volver
             </Link>
-            <button onClick={resetForAnotherGuest} className="rounded-sm bg-olive-600 px-6 py-3 text-xs uppercase tracking-[0.12em] text-cream transition-colors hover:bg-olive-700">
-              Confirmar otro
-            </button>
           </div>
         </div>
       </div>
@@ -300,7 +312,16 @@ export function RSVPPage() {
                 />
               </div>
 
-              <Button type="submit" variant="primary" size="lg" className="w-full">Confirmar asistencia</Button>
+              <div className="space-y-3">
+                <Button type="submit" variant="primary" size="lg" className="w-full">Confirmar asistencia</Button>
+                <button
+                  type="button"
+                  onClick={handleCancelAttendance}
+                  className="w-full rounded-sm border border-rose-200 bg-white px-5 py-3 text-xs uppercase tracking-[0.12em] text-rose-500 transition-colors hover:bg-rose-50"
+                >
+                  No podré asistir
+                </button>
+              </div>
             </form>
           )}
         </GlassCard>

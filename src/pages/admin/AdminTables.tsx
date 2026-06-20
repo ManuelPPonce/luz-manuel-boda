@@ -46,10 +46,25 @@ export function AdminTables() {
 
   async function handleDelete(id: string) { if (window.confirm('¿Eliminar este elemento?')) { await deleteTable(id); refresh(); } }
 
+  function patchLocalTable(id: string, updates: Partial<TableData>) {
+    setTables((current) => current.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+  }
+
   function handleDragStart(e: React.MouseEvent, table: TableData) {
+    e.preventDefault();
     const startX = e.clientX, startY = e.clientY, origX = table.x, origY = table.y;
-    function onMove(ev: MouseEvent) { updateTable(table.id, { x: origX + (ev.clientX - startX), y: origY + (ev.clientY - startY) }); refresh(); }
-    function onUp() { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); }
+    let finalUpdate: Partial<TableData> = { x: origX, y: origY };
+    let changed = false;
+    function onMove(ev: MouseEvent) {
+      finalUpdate = { x: origX + (ev.clientX - startX), y: origY + (ev.clientY - startY) };
+      changed = true;
+      patchLocalTable(table.id, finalUpdate);
+    }
+    function onUp() {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      if (changed) updateTable(table.id, finalUpdate);
+    }
     window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
   }
 
@@ -60,18 +75,26 @@ export function AdminTables() {
     const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
     const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
     const origRotation = table.rotation;
+    let finalUpdate: Partial<TableData> = { rotation: origRotation };
+    let changed = false;
     function onMove(ev: MouseEvent) {
       const angle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI);
-      updateTable(table.id, { rotation: Math.round((origRotation + (angle - startAngle)) / 15) * 15 });
-      refresh();
+      finalUpdate = { rotation: Math.round((origRotation + (angle - startAngle)) / 15) * 15 };
+      changed = true;
+      patchLocalTable(table.id, finalUpdate);
     }
-    function onUp() { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); }
+    function onUp() {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      if (changed) updateTable(table.id, finalUpdate);
+    }
     window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
   }
 
   function handleResizeStart(e: React.MouseEvent, table: TableData, corner: 'se' | 'sw' | 'ne' | 'nw' | 's' | 'e') {
     e.stopPropagation();
     const startX = e.clientX, startY = e.clientY, ow = table.w, oh = table.h, ox = table.x, oy = table.y;
+    let finalUpdate: Partial<TableData> = {};
     function onMove(ev: MouseEvent) {
       const dx = ev.clientX - startX, dy = ev.clientY - startY;
       const upd: any = {};
@@ -79,9 +102,14 @@ export function AdminTables() {
       if (corner === 's' || corner === 'se' || corner === 'sw') upd.h = Math.max(40, oh + dy);
       if (corner === 'sw' || corner === 'nw') { upd.w = Math.max(40, ow - dx); upd.x = ox + dx; }
       if (corner === 'nw' || corner === 'ne') { upd.h = Math.max(40, oh - dy); upd.y = oy + dy; }
-      updateTable(table.id, upd); refresh();
+      finalUpdate = upd;
+      patchLocalTable(table.id, finalUpdate);
     }
-    function onUp() { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); }
+    function onUp() {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      if (Object.keys(finalUpdate).length) updateTable(table.id, finalUpdate);
+    }
     window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
   }
 

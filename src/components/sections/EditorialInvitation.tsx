@@ -24,6 +24,14 @@ const galleryImages = [
   '/images/galery/Luz&ManuelSavetheDate-83.webp',
 ];
 
+const frameImages = [
+  '/images/frame/frame-01.webp',
+  '/images/frame/frame-02.webp',
+  '/images/frame/frame-03.webp',
+  '/images/frame/frame-04.webp',
+  '/images/frame/frame-05.webp',
+];
+
 const floralImages = {
   corner: '/images/floral/floral-corner-transparent.png',
   bouquet: '/images/floral/floral-bouquet-transparent.png',
@@ -35,6 +43,16 @@ const WEDDING_YEAR = 2026;
 const WEDDING_MONTH_INDEX = 6;
 const WEDDING_DAY = 18;
 const weekDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+const parents = [
+  {
+    role: 'Padres de la novia',
+    names: ['José Ruben Canales Cruz', 'Maria Del Carmen Mendoza Rodriguez'],
+  },
+  {
+    role: 'Padres del novio',
+    names: ['Josué Manuel Pérez Cheng', 'Nubia Del Sugey Ponce'],
+  },
+];
 
 function FloralDecor({ src, className = '' }: { src: string; className?: string }) {
   return <img src={src} alt="" aria-hidden="true" loading="lazy" className={`floral-decor ${className}`} />;
@@ -85,6 +103,7 @@ export function EditorialInvitation() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const gift = GIFT_REGISTRY[0];
   const [activeImage, setActiveImage] = useState(0);
+  const [activeFrame, setActiveFrame] = useState(0);
   const previousImage = (activeImage - 1 + galleryImages.length) % galleryImages.length;
   const nextImage = (activeImage + 1) % galleryImages.length;
   const weddingDate = new Date(WEDDING_YEAR, WEDDING_MONTH_INDEX, WEDDING_DAY);
@@ -104,6 +123,16 @@ export function EditorialInvitation() {
   function showNextImage() {
     setActiveImage((current) => (current + 1) % galleryImages.length);
   }
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const interval = window.setInterval(() => {
+      setActiveFrame((current) => (current + 1) % frameImages.length);
+    }, 2600);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -204,8 +233,22 @@ export function EditorialInvitation() {
               Luz<br />&amp; Manuel
             </h2>
             <p className="mt-6 max-w-xl text-sm leading-7 text-olive-900/75 md:text-base">
-              Con la bendicion de nuestras familias, celebraremos el inicio de una vida juntos. Gracias por acompanarnos en una noche hecha de amor, musica y recuerdos.
+              Con la bendición de nuestras familias, celebraremos el inicio de una vida juntos. Gracias por acompanarnos en una noche hecha de amor, música y recuerdos.
             </p>
+            <div className="mt-8 grid max-w-xl gap-5 border-y border-olive-200/70 py-6 md:grid-cols-2">
+              {parents.map((group) => (
+                <div key={group.role}>
+                  <p className="text-[9px] uppercase tracking-[0.22em] text-olive-700/70">{group.role}</p>
+                  <div className="mt-3 space-y-1.5">
+                    {group.names.map((name) => (
+                      <p key={name} className="font-serif text-base leading-6 text-olive-900 md:text-lg">
+                        {name}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="mt-8 inline-flex items-center justify-center bg-olive-800 px-6 py-3 font-serif text-xs uppercase tracking-[0.22em] text-cream">
               18 Julio 2026
             </div>
@@ -241,8 +284,14 @@ export function EditorialInvitation() {
         <div className="scroll-reveal relative z-10 mt-16">
           <SectionHeading eyebrow="Cuenta regresiva" title="Faltan" light />
           <CountdownStrip />
-          <div className="mx-auto mt-12 max-w-xl overflow-hidden bg-cream text-olive-900">
-            <img src={galleryImages[5]} alt="Luz y Manuel" className="h-80 w-full object-cover" loading="lazy" />
+          <div className="mx-auto mt-12 max-w-xl overflow-hidden bg-cream text-olive-900 md:max-w-sm">
+            <img
+              key={frameImages[activeFrame]}
+              src={frameImages[activeFrame]}
+              alt="Luz y Manuel"
+              className="countdown-frame-image h-80 w-full object-cover object-center md:h-[540px]"
+              loading={activeFrame === 0 ? 'eager' : 'lazy'}
+            />
             <div className="p-7 text-center">
               <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-olive-50 text-olive-700">
                 <Timer className="h-5 w-5" aria-hidden="true" />
@@ -425,7 +474,7 @@ export function EditorialInvitation() {
           Nos emociona celebrar rodeados de las personas que forman parte de nuestra historia. Tu presencia hara que este dia sea todavia mas especial.
         </p>
         <div className="scroll-reveal relative z-10 mt-10 text-center">
-          <Link to="/rsvp" className="inline-flex items-center justify-center gap-2 bg-cream px-6 py-3 text-xs uppercase tracking-[0.18em] text-olive-800 shadow-[0_14px_34px_rgba(20,30,46,0.12)] transition hover:bg-white">
+          <Link id="confirmar-asistencia" to="/rsvp" className="inline-flex scroll-mt-28 items-center justify-center gap-2 bg-cream px-6 py-3 text-xs uppercase tracking-[0.18em] text-olive-800 shadow-[0_14px_34px_rgba(20,30,46,0.12)] transition hover:bg-white">
             <Heart className="h-4 w-4" aria-hidden="true" />
             Confirmar asistencia
           </Link>

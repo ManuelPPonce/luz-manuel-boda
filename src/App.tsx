@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Play } from 'lucide-react';
 import { Navbar } from './components/layout/Navbar';
 import { MusicPlayer } from './components/effects/MusicPlayer';
 import { EditorialInvitation } from './components/sections/EditorialInvitation';
@@ -17,11 +16,20 @@ import { AdminCheckIn } from './pages/admin/AdminCheckIn';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const INTRO_SEEN_KEY = 'luz-manuel-intro-seen';
+
 function MainContent() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const resumeAfterReturnRef = useRef(false);
   const [introOpen, setIntroOpen] = useState(true);
   const [introKey, setIntroKey] = useState(0);
+  const [introSeen, setIntroSeen] = useState(() => {
+    try {
+      return window.localStorage.getItem(INTRO_SEEN_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
 
   const playMusic = useCallback(() => {
     const audio = audioRef.current;
@@ -31,23 +39,14 @@ function MainContent() {
     audio.play().catch(() => {});
   }, []);
 
-  const pauseMusic = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-  }, []);
-
   const closeIntro = useCallback(() => {
+    try {
+      window.localStorage.setItem(INTRO_SEEN_KEY, 'true');
+    } catch {}
+    setIntroSeen(true);
     playMusic();
     setIntroOpen(false);
   }, [playMusic]);
-
-  const replayIntro = useCallback(() => {
-    pauseMusic();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setIntroKey((current) => current + 1);
-    setIntroOpen(true);
-  }, [pauseMusic]);
 
   useEffect(() => {
     const smoothScroll = (e: MouseEvent) => {
@@ -125,7 +124,7 @@ function MainContent() {
 
   return (
     <>
-      {introOpen && <IntroVideo key={introKey} onComplete={closeIntro} />}
+      {introOpen && <IntroVideo key={introKey} onComplete={closeIntro} showSkipButton={introSeen} />}
       {!introOpen && (
         <>
           <Navbar />
@@ -142,17 +141,6 @@ function MainContent() {
           </footer>
           <MusicPlayer audioRef={audioRef} />
         </>
-      )}
-      {!introOpen && (
-        <button
-          type="button"
-          onClick={replayIntro}
-          className="fixed bottom-6 left-6 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-white/88 px-4 text-[10px] uppercase tracking-[0.16em] text-olive-800 shadow-lg backdrop-blur transition hover:bg-white hover:shadow-xl"
-          title="Volver a ver la intro"
-        >
-          <Play className="h-4 w-4" aria-hidden="true" />
-          Intro
-        </button>
       )}
       <audio ref={audioRef} src="/music/playlist.mp3" loop preload="auto" />
     </>

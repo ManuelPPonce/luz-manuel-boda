@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 
 interface IntroVideoProps {
   onComplete: () => void;
+  showSkipButton?: boolean;
 }
 
-export function IntroVideo({ onComplete }: IntroVideoProps) {
+export function IntroVideo({ onComplete, showSkipButton = false }: IntroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
 
@@ -53,9 +54,11 @@ export function IntroVideo({ onComplete }: IntroVideoProps) {
             onEnded={onComplete}
             aria-label="Intro de boda de Luz y Manuel"
           />
-          <button type="button" onClick={onComplete} className="intro-enter-button">
-            Entrar
-          </button>
+          {showSkipButton && (
+            <button type="button" onClick={onComplete} className="intro-enter-button">
+              <span>Entrar</span>
+            </button>
+          )}
         </div>
       </div>
       {!videoReady && (

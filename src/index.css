@@ -70,32 +70,52 @@
 
   .intro-enter-button {
     position: absolute;
-    right: clamp(14px, 4.25%, 24px);
-    bottom: clamp(52px, 9.75%, 78px);
+    right: clamp(18px, 5%, 28px);
+    bottom: clamp(34px, 5.1%, 50px);
     z-index: 10;
     display: inline-flex;
-    min-width: clamp(116px, 28%, 142px);
-    min-height: clamp(40px, 6.2%, 48px);
+    min-width: clamp(104px, 27%, 132px);
+    min-height: clamp(34px, 5.2%, 42px);
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background: rgba(246, 242, 236, 0.97);
-    padding: 10px 18px;
+    background: transparent;
+    padding: 8px 16px;
     font-family: Playfair Display, Georgia, serif;
-    font-size: 10px;
+    font-size: 8px;
     line-height: 1;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #4f5b3f;
-    box-shadow: 0 14px 34px rgba(20, 30, 46, 0.24);
-    backdrop-filter: blur(10px);
+    color: rgba(246, 242, 236, 0.92);
+    isolation: isolate;
+    text-shadow: 0 1px 6px rgba(17, 21, 19, 0.38);
     transition: transform 280ms ease, background-color 280ms ease, box-shadow 280ms ease;
   }
 
+  .intro-enter-button::before {
+    content: '';
+    position: absolute;
+    inset: -7px -10px -10px -12px;
+    z-index: 0;
+    border-radius: inherit;
+    background: rgba(17, 21, 19, 0.16);
+    box-shadow: 0 10px 26px rgba(17, 21, 19, 0.2);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(246, 242, 236, 0.38);
+  }
+
+  .intro-enter-button span {
+    position: relative;
+    z-index: 1;
+  }
+
   .intro-enter-button:hover {
-    background: #fff;
-    box-shadow: 0 18px 42px rgba(20, 30, 46, 0.28);
     transform: translateY(-1px);
+  }
+
+  .intro-enter-button:hover::before {
+    background: rgba(17, 21, 19, 0.22);
+    box-shadow: 0 14px 32px rgba(17, 21, 19, 0.24);
   }
 
   .intro-enter-button:active {
@@ -282,6 +302,10 @@
     animation: carouselSideIn 1200ms cubic-bezier(0.16, 1, 0.3, 1);
     transition: opacity 1000ms ease, transform 1400ms cubic-bezier(0.16, 1, 0.3, 1), filter 1000ms ease;
     will-change: opacity, transform, filter;
+  }
+
+  .countdown-frame-image {
+    display: block;
   }
 }
 

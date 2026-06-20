@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { CalendarDays, ChevronDown, MapPin, Send } from 'lucide-react';
 
@@ -84,15 +83,15 @@ export function Hero() {
         </p>
 
         <div className="hero-cta mt-8">
-          <Link
-            to="/rsvp"
+          <a
+            href="#confirmar-asistencia"
             className="relative inline-flex items-center justify-center overflow-hidden bg-olive-800/95 px-12 py-4 font-serif text-base uppercase tracking-[0.15em] text-cream shadow-xl shadow-slate-900/25 transition-all duration-500 hover:bg-olive-900 active:scale-[0.97]"
           >
             <span className="inline-flex items-center gap-2">
               Confirmar
               <Send className="h-4 w-4" aria-hidden="true" />
             </span>
-          </Link>
+          </a>
         </div>
       </div>
 

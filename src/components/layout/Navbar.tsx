@@ -5,7 +5,7 @@ const NAV_ITEMS = [
   { label: 'Inicio', href: '#hero' },
   { label: 'Invitacion', href: '#invitation' },
   { label: 'Evento', href: '#event' },
-  { label: 'Galeria', href: '#gallery' },
+  { label: 'Galería', href: '#gallery' },
   { label: 'Regalos', href: '#gifts' },
 ];
 

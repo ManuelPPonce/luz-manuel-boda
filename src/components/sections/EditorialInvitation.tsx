@@ -9,9 +9,9 @@ import { COUPLE, GIFT_REGISTRY } from '../../data';
 gsap.registerPlugin(ScrollTrigger);
 
 const schedule = [
-  { time: '19:00', title: 'Llegada de invitados', note: 'Recepcion en el lobby del salon', icon: Clock3 },
-  { time: '20:00', title: 'Ceremonia civil', note: 'Acompananos a decir si', icon: ScrollText },
-  { time: '21:00', title: 'Banquete', note: 'Cena, brindis y celebracion', icon: Utensils },
+  { time: '19:00', title: 'Llegada de invitados', note: 'Recepción en el lobby del salón', icon: Clock3 },
+  { time: '20:00', title: 'Ceremonia civil', note: 'Acompáñanos a decir sí', icon: ScrollText },
+  { time: '21:00', title: 'Banquete', note: 'Cena, brindis y celebración', icon: Utensils },
   { time: '23:00', title: 'Baile', note: 'La pista se abre para todos', icon: Music2 },
 ];
 
@@ -46,7 +46,7 @@ const weekDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
 const parents = [
   {
     role: 'Padres de la novia',
-    names: ['José Ruben Canales Cruz', 'Maria Del Carmen Mendoza Rodriguez'],
+    names: ['José Rubén Canales Cruz', 'María Del Carmen Mendoza Rodríguez'],
   },
   {
     role: 'Padres del novio',
@@ -81,7 +81,7 @@ function SectionHeading({ eyebrow, title, light = false }: { eyebrow?: string; t
 function CountdownStrip() {
   const time = useCountdown(COUPLE.date);
   const units = [
-    { value: time.days, label: 'Dias' },
+    { value: time.days, label: 'Días' },
     { value: time.hours, label: 'Horas' },
     { value: time.minutes, label: 'Min' },
     { value: time.seconds, label: 'Seg' },
@@ -106,9 +106,6 @@ export function EditorialInvitation() {
   const [activeFrame, setActiveFrame] = useState(0);
   const previousImage = (activeImage - 1 + galleryImages.length) % galleryImages.length;
   const nextImage = (activeImage + 1) % galleryImages.length;
-  const weddingDate = new Date(WEDDING_YEAR, WEDDING_MONTH_INDEX, WEDDING_DAY);
-  const monthName = new Intl.DateTimeFormat('es-MX', { month: 'long' }).format(weddingDate);
-  const weekdayName = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(weddingDate);
   const firstDayOffset = (new Date(WEDDING_YEAR, WEDDING_MONTH_INDEX, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(WEDDING_YEAR, WEDDING_MONTH_INDEX + 1, 0).getDate();
 
@@ -129,7 +126,7 @@ export function EditorialInvitation() {
 
     const interval = window.setInterval(() => {
       setActiveFrame((current) => (current + 1) % frameImages.length);
-    }, 2600);
+    }, 1300);
 
     return () => window.clearInterval(interval);
   }, []);
@@ -228,12 +225,12 @@ export function EditorialInvitation() {
           </div>
 
           <div className="scroll-reveal text-center md:text-left">
-            <p className="font-script text-3xl italic text-olive-700">Queremos compartir este dia contigo</p>
+            <p className="font-script text-3xl italic text-olive-700">Queremos compartir este día contigo</p>
             <h2 className="mt-5 font-serif text-4xl font-light uppercase leading-tight tracking-[0.08em] text-olive-900 md:text-6xl">
               Luz<br />&amp; Manuel
             </h2>
             <p className="mt-6 max-w-xl text-sm leading-7 text-olive-900/75 md:text-base">
-              Con la bendición de nuestras familias, celebraremos el inicio de una vida juntos. Gracias por acompanarnos en una noche hecha de amor, música y recuerdos.
+              Con la bendición de nuestras familias, celebraremos el inicio de una vida juntos. Gracias por acompañarnos en una noche de amor y recuerdos.
             </p>
             <div className="mt-8 grid max-w-xl gap-5 border-y border-olive-200/70 py-6 md:grid-cols-2">
               {parents.map((group) => (
@@ -250,7 +247,7 @@ export function EditorialInvitation() {
               ))}
             </div>
             <div className="mt-8 inline-flex items-center justify-center bg-olive-800 px-6 py-3 font-serif text-xs uppercase tracking-[0.22em] text-cream">
-              18 Julio 2026
+              18 de julio de 2026
             </div>
           </div>
         </div>
@@ -276,9 +273,6 @@ export function EditorialInvitation() {
                 </span>
               ))}
             </div>
-            <p className="mt-6 text-center text-[11px] uppercase tracking-[0.24em] text-olive-700">
-              {weekdayName} {WEDDING_DAY} de {monthName} de {WEDDING_YEAR}
-            </p>
           </div>
         </div>
         <div className="scroll-reveal relative z-10 mt-16">
@@ -296,7 +290,7 @@ export function EditorialInvitation() {
               <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-olive-50 text-olive-700">
                 <Timer className="h-5 w-5" aria-hidden="true" />
               </div>
-              <p className="font-serif text-2xl text-olive-900">18 Julio 2026</p>
+              <p className="font-serif text-2xl text-olive-900">18 de julio de 2026</p>
               <p className="mt-2 text-xs uppercase tracking-[0.18em] text-olive-700/60">Luz &amp; Manuel</p>
             </div>
           </div>
@@ -307,7 +301,7 @@ export function EditorialInvitation() {
       <section id="event" className="scroll-section paper-section paper-section-cream px-5 py-20 md:px-8 md:py-28">
         <FloralDecor src={floralImages.spray} className="-right-28 bottom-[-150px] w-[330px] rotate-[10deg] opacity-[0.18] md:-right-16 md:bottom-[-190px] md:w-[560px]" />
         <FloralDecor src={floralImages.bouquet} className="-left-28 top-8 w-[220px] -rotate-12 opacity-[0.12] md:-left-10 md:top-12 md:w-[320px]" />
-        <SectionHeading eyebrow="Ceremonia y recepcion" title="Lugar" />
+        <SectionHeading eyebrow="Ceremonia y recepción" title="Lugar" />
         <div className="relative z-10 mx-auto grid max-w-6xl gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-center">
           <div className="map-frame relative overflow-hidden bg-white/75 p-2 shadow-[0_24px_60px_rgba(20,30,46,0.12)] ring-1 ring-olive-100">
             <iframe
@@ -330,7 +324,7 @@ export function EditorialInvitation() {
               className="mt-8 inline-flex items-center justify-center gap-2 bg-olive-700 px-6 py-3 text-xs uppercase tracking-[0.18em] text-cream transition hover:bg-olive-800"
             >
               <MapPin className="h-4 w-4" aria-hidden="true" />
-              Ver ubicacion
+              Ver ubicación
             </a>
           </div>
         </div>
@@ -339,10 +333,10 @@ export function EditorialInvitation() {
 
       <section className="scroll-section paper-section paper-section-sage px-5 py-20 md:px-8 md:py-28">
         <div className="relative z-10">
-          <SectionHeading eyebrow="Programa" title="Timing" light />
+          <SectionHeading title="Timing" light />
         </div>
         <p className="scroll-reveal relative z-10 mx-auto -mt-2 mb-12 max-w-2xl text-center text-sm leading-7 text-cream">
-          Una noche pensada para celebrar con calma, emocion y muchos recuerdos.
+          Una noche pensada para celebrar con calma, emoción y muchos recuerdos.
         </p>
         <div className="schedule-list relative z-10 mx-auto max-w-4xl">
           {schedule.map((item, index) => {
@@ -365,9 +359,9 @@ export function EditorialInvitation() {
                 </div>
 
                 <div className="group border border-cream/75 bg-cream p-5 text-olive-900 shadow-[0_14px_34px_rgba(20,30,46,0.08)] transition duration-500 hover:-translate-y-1 hover:border-white hover:shadow-[0_20px_44px_rgba(20,30,46,0.12)] md:p-6">
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-olive-700/80">Momento {index + 1}</p>
+                  {/* <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-olive-700/80">Momento {index + 1}</p> */}
                   <h3 className="font-serif text-2xl text-olive-900 md:text-3xl">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-olive-900/75">{item.note}</p>
+                  {/* <p className="mt-2 text-sm leading-6 text-olive-900/75">{item.note}</p> */}
                 </div>
               </div>
             );
@@ -379,7 +373,7 @@ export function EditorialInvitation() {
       <section id="gallery" className="scroll-section paper-section paper-section-cream px-5 py-20 md:px-8 md:py-28">
         <FloralDecor src={floralImages.corner} className="-left-36 bottom-[-210px] w-[420px] -rotate-3 opacity-[0.16] md:-left-28 md:bottom-[-250px] md:w-[650px]" />
         <FloralDecor src={floralImages.spray} className="-right-28 top-0 w-[280px] rotate-[16deg] opacity-[0.12] md:-right-16 md:top-10 md:w-[430px]" />
-        <SectionHeading eyebrow="Recuerdos" title="Galeria" />
+        <SectionHeading eyebrow="Recuerdos" title="Galería" />
         <p className="scroll-reveal relative z-10 mx-auto max-w-2xl text-center text-sm leading-7 text-olive-900/75">
           Algunos instantes de nuestra historia antes de celebrar este nuevo comienzo con ustedes.
         </p>
@@ -404,7 +398,7 @@ export function EditorialInvitation() {
               <img
                 key={activeImage}
                 src={galleryImages[activeImage]}
-                alt={`Galeria Luz y Manuel ${activeImage + 1}`}
+                alt={`Galería Luz y Manuel ${activeImage + 1}`}
                 className="carousel-main-image h-[420px] w-full object-cover md:h-[560px]"
                 loading="lazy"
               />
@@ -468,10 +462,10 @@ export function EditorialInvitation() {
 
       <section className="scroll-section paper-section paper-section-sage px-5 py-20 md:px-8 md:py-28">
         <div className="relative z-10">
-          <SectionHeading eyebrow="Con carino" title="Deseos" light />
+          <SectionHeading eyebrow="Con cariño" title="Deseos" light />
         </div>
         <p className="scroll-reveal relative z-10 mx-auto max-w-2xl text-center text-sm leading-7 text-cream">
-          Nos emociona celebrar rodeados de las personas que forman parte de nuestra historia. Tu presencia hara que este dia sea todavia mas especial.
+          Nos emociona celebrar rodeados de las personas que forman parte de nuestra historia. Tu presencia hará que este día sea todavía más especial.
         </p>
         <div className="scroll-reveal relative z-10 mt-10 text-center">
           <Link id="confirmar-asistencia" to="/rsvp" className="inline-flex scroll-mt-28 items-center justify-center gap-2 bg-cream px-6 py-3 text-xs uppercase tracking-[0.18em] text-olive-800 shadow-[0_14px_34px_rgba(20,30,46,0.12)] transition hover:bg-white">
@@ -491,9 +485,10 @@ export function EditorialInvitation() {
         <div className="gift-grid relative z-10 mx-auto grid max-w-5xl gap-5 md:grid-cols-2">
           <div className="gift-panel scroll-reveal border border-olive-100 bg-white/70 p-8 text-center">
             <Gift className="mx-auto mb-5 h-8 w-8 text-olive-700" aria-hidden="true" />
-            <h3 className="font-serif text-3xl text-olive-900">Liverpool</h3>
-            <p className="mx-auto mt-4 max-w-sm text-sm leading-7 text-olive-900/75">{gift.description}</p>
-            <a href={gift.link} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center justify-center gap-2 bg-olive-700 px-6 py-3 text-xs uppercase tracking-[0.18em] text-cream transition hover:bg-olive-800">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-olive-700/70">Liverpool</p>
+            <h3 className="font-serif text-3xl text-olive-900 md:text-4xl">Mesa de regalos</h3>
+            <p className="mx-auto mt-4 max-w-md text-base leading-8 text-olive-900/75 md:text-lg">{gift.description}</p>
+            <a href={gift.link} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center justify-center gap-2 bg-olive-700 px-7 py-3.5 text-sm uppercase tracking-[0.16em] text-cream transition hover:bg-olive-800">
               Ver lista
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>
@@ -501,9 +496,11 @@ export function EditorialInvitation() {
 
           <div className="gift-panel scroll-reveal border border-olive-100 bg-white/70 p-8 text-center">
             <Copy className="mx-auto mb-5 h-8 w-8 text-olive-700" aria-hidden="true" />
-            <h3 className="font-serif text-3xl text-olive-900">Transferencia</h3>
-            <p className="mt-4 font-mono text-sm tracking-[0.12em] text-olive-900/75">{CARD_NUMBER}</p>
-            <button onClick={copyNumber} className="mt-7 inline-flex items-center justify-center gap-2 border border-olive-300 px-6 py-3 text-xs uppercase tracking-[0.18em] text-olive-700 transition hover:bg-olive-50">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-olive-700/70">Transferencia</p>
+            <h3 className="font-serif text-3xl text-olive-900 md:text-4xl">Tarjeta NU</h3>
+            <p className="mt-4 text-xs uppercase tracking-[0.18em] text-olive-700/60">Número de tarjeta</p>
+            <p className="mt-2 font-mono text-lg tracking-[0.12em] text-olive-900/80 md:text-xl">{CARD_NUMBER}</p>
+            <button onClick={copyNumber} className="mt-7 inline-flex items-center justify-center gap-2 border border-olive-300 px-7 py-3.5 text-sm uppercase tracking-[0.16em] text-olive-700 transition hover:bg-olive-50">
               Copiar tarjeta
             </button>
           </div>

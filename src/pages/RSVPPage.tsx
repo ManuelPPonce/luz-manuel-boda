@@ -190,7 +190,7 @@ export function RSVPPage() {
           </Link>
           <h1 className="mb-2 mt-6 font-serif text-3xl font-light tracking-[0.08em] text-slate-700 md:text-5xl">Confirmar asistencia</h1>
           <p className="text-sm text-slate-500/70">
-            Confirma antes del <span className="font-medium text-olive-600">18 de Junio de 2026</span>
+            Confirma antes del <span className="font-medium text-olive-600">27 de Junio de 2026</span>
           </p>
         </div>
 

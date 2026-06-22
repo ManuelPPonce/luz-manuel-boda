@@ -5,7 +5,6 @@ export function CalendarSection() {
 
   const weddingDate = new Date(year, month - 1, day);
   const monthName = new Intl.DateTimeFormat('es-MX', { month: 'long' }).format(weddingDate);
-  const dayName = new Intl.DateTimeFormat('es-MX', { weekday: 'long' }).format(weddingDate);
 
   const firstDay = new Date(year, month - 1, 1).getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -46,9 +45,6 @@ export function CalendarSection() {
       </div>
 
       <div className="mt-4 text-center">
-        <p className="text-slate-600 text-xs capitalize font-medium">
-          {dayName}, {day} de {monthName} del {year}
-        </p>
         <p className="text-olive-600 text-xs font-medium mt-1">7:00 PM · Llegada de invitados</p>
       </div>
     </div>

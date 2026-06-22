@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TOTAL = 5;
-const INTERVAL_MS = 1500;
+const INTERVAL_MS = 1000;
 
 export function FrameAnimation() {
   const [frame, setFrame] = useState(1);

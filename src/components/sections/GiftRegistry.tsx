@@ -40,8 +40,9 @@ export function GiftRegistry() {
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           <GlassCard className="gift-card p-8 text-center group hover:-translate-y-1 transition-transform duration-300">
             <div className="text-5xl mb-4 text-gold-500">&#127873;</div>
-            <h3 className="font-serif text-2xl text-slate-700 mb-3">Liverpool</h3>
-            <p className="text-slate-500/70 text-sm leading-relaxed mb-6">{gift.description}</p>
+            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">Liverpool</p>
+            <h3 className="font-serif text-3xl text-slate-700 mb-3">Mesa de regalos</h3>
+            <p className="text-slate-500/70 text-base leading-relaxed mb-6">{gift.description}</p>
             <a href={gift.link} target="_blank" rel="noopener noreferrer">
               <Button variant="primary" size="lg">Ver lista</Button>
             </a>
@@ -49,10 +50,8 @@ export function GiftRegistry() {
 
           <GlassCard className="gift-card p-8 text-center group hover:-translate-y-1 transition-transform duration-300">
             <div className="text-5xl mb-4 text-olive-500">&#128179;</div>
-            <h3 className="font-serif text-2xl text-slate-700 mb-3">Transferencia o Depósito</h3>
-            <p className="text-slate-500/70 text-sm leading-relaxed mb-4">
-              Tarjeta NU
-            </p>
+            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">Transferencia</p>
+            <h3 className="font-serif text-3xl text-slate-700 mb-3">Tarjeta NU</h3>
             <div className="bg-olive-50 border border-olive-200 rounded-sm px-4 py-3 mb-4 font-mono text-sm text-slate-700 tracking-wider select-all">
               {CARD_NUMBER}
             </div>

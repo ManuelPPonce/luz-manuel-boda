@@ -258,7 +258,7 @@ export function RSVPPage() {
                     <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-slate-400">Personas</p>
                   </div>
                   <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
-                    <p className="font-serif text-3xl text-olive-600">{attendingCompanions}/{guestCount}</p>
+                    <p className="font-serif text-3xl text-olive-600">{attendingCompanions + 1}/{guestCount + 1}</p>
                     <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-slate-400">Asistentes</p>
                   </div>
                 </div>

@@ -199,7 +199,7 @@ export function RSVPPage() {
             <form onSubmit={handleSearch} className="space-y-5">
               <div className="mb-4 text-center">
                 <div className="mb-3 text-4xl">&#128220;</div>
-                <p className="text-sm text-slate-500/70">Ingresa tu nombre para encontrar tu información</p>
+                <p className="text-sm text-slate-500/70">Ingresa tu nombre o el de tu familia para encontrar tu información</p>
               </div>
               <div ref={searchRef} className="relative">
                 <input

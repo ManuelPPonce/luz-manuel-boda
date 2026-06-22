@@ -9,10 +9,10 @@ import { COUPLE, GIFT_REGISTRY } from '../../data';
 gsap.registerPlugin(ScrollTrigger);
 
 const schedule = [
-  { time: '19:00', title: 'Llegada de invitados', note: 'Recepción en el lobby del salón', icon: Clock3 },
+  { time: '19:00', title: 'Recepción de invitados', note: 'Llegada de los invitados y asignación de mesa', icon: Clock3 },
   { time: '20:00', title: 'Ceremonia civil', note: 'Acompáñanos a decir sí', icon: ScrollText },
   { time: '21:00', title: 'Banquete', note: 'Cena, brindis y celebración', icon: Utensils },
-  { time: '23:00', title: 'Baile', note: 'La pista se abre para todos', icon: Music2 },
+  { time: '23:00', title: 'Baile', note: 'Se abre la pista', icon: Music2 },
 ];
 
 const galleryImages = [
@@ -361,7 +361,7 @@ export function EditorialInvitation() {
                 <div className="group border border-cream/75 bg-cream p-5 text-olive-900 shadow-[0_14px_34px_rgba(20,30,46,0.08)] transition duration-500 hover:-translate-y-1 hover:border-white hover:shadow-[0_20px_44px_rgba(20,30,46,0.12)] md:p-6">
                   {/* <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-olive-700/80">Momento {index + 1}</p> */}
                   <h3 className="font-serif text-2xl text-olive-900 md:text-3xl">{item.title}</h3>
-                  {/* <p className="mt-2 text-sm leading-6 text-olive-900/75">{item.note}</p> */}
+                  <p className="mt-2 text-sm leading-6 text-olive-900/75">{item.note}</p>
                 </div>
               </div>
             );
@@ -462,7 +462,7 @@ export function EditorialInvitation() {
 
       <section className="scroll-section paper-section paper-section-sage px-5 py-20 md:px-8 md:py-28">
         <div className="relative z-10">
-          <SectionHeading eyebrow="Con cariño" title="Deseos" light />
+          <SectionHeading eyebrow="" title="CON CARIÑO" light />
         </div>
         <p className="scroll-reveal relative z-10 mx-auto max-w-2xl text-center text-sm leading-7 text-cream">
           Nos emociona celebrar rodeados de las personas que forman parte de nuestra historia. Tu presencia hará que este día sea todavía más especial.

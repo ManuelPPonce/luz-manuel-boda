@@ -251,7 +251,7 @@ export function RSVPPage() {
               )}
 
               <div className="rounded-sm border border-olive-100 bg-olive-50/50 p-4">
-                <p className="mb-3 text-[10px] uppercase tracking-[0.15em] text-slate-500">Lugares asignados</p>
+                <p className="mb-3 text-[10px] uppercase tracking-[0.15em] text-slate-500">Lugares reservados</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
                     <p className="font-serif text-3xl text-olive-600">{attendingCompanions + 1}</p>
@@ -259,7 +259,7 @@ export function RSVPPage() {
                   </div>
                   <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
                     <p className="font-serif text-3xl text-olive-600">{attendingCompanions}/{guestCount}</p>
-                    <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-slate-400">Acompañantes</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-slate-400">Asistentes</p>
                   </div>
                 </div>
 
@@ -283,7 +283,7 @@ export function RSVPPage() {
                           />
                           {companionName}
                         </span>
-                        <span className="text-[9px] uppercase tracking-[0.12em] text-slate-400">Acompañante {index + 1}</span>
+                        <span className="text-[9px] uppercase tracking-[0.12em] text-slate-400">Invitado {index + 1}</span>
                       </label>
                     );
                   })}

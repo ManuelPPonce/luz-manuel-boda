@@ -246,7 +246,7 @@ export function EditorialInvitation() {
                 </div>
               ))}
             </div>
-            <div className="mt-8 inline-flex items-center justify-center bg-olive-800 px-6 py-3 font-serif text-xs uppercase tracking-[0.22em] text-cream">
+            <div className="mt-8 inline-flex items-center justify-center bg-olive-800 px-7 py-3.5 font-serif text-sm uppercase tracking-[0.22em] text-cream md:text-base">
               18 de julio de 2026
             </div>
           </div>
@@ -258,6 +258,7 @@ export function EditorialInvitation() {
         <div className="relative z-10">
           <SectionHeading eyebrow="La fecha" title="Calendario" light />
           <div className="scroll-reveal mx-auto max-w-md bg-cream px-7 py-8 text-olive-900 shadow-[0_18px_50px_rgba(20,30,46,0.08)]">
+            <p className="mb-5 text-center font-serif text-3xl text-olive-900">Julio</p>
             <div className="mb-5 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-olive-700/60">
               {weekDays.map((day) => (
                 <span key={day}>{day}</span>

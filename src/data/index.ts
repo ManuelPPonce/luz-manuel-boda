@@ -25,6 +25,7 @@ export const EVENT_DETAILS: EventDetails[] = [
 
 export const GIFT_REGISTRY: GiftItem[] = [
   { name: 'Liverpool', description: 'Tu presencia es el mejor regalo, pero si deseas obsequiarnos algo, aquí hay algunas ideas.', price: '', link: 'https://mesaderegalos.liverpool.com.mx/milistaderegalos/51956113' },
+  { name: 'Amazon', description: 'También puedes ver nuestra mesa de regalos en Amazon.', price: '', link: 'https://www.amazon.com.mx/wedding/guest-view/27FS1W2TXL49D' },
 ];
 
 export const ADMIN_PASSWORD = 'luz2026';
@@ -192,24 +193,37 @@ function combineGuests(pre: PreGuest[], confirmed: ConfirmedGuest[]): CombinedGu
   const canceled = currentCancellations(confirmed);
   const confirmedMap = new Map(activeConfirmed.map(c => [c.id, c]));
   const canceledMap = new Map(canceled.map(c => [c.id, c]));
-  const result: CombinedGuest[] = pre.map(p => ({
-    id: p.id, name: p.name, guests: p.guests, companionNames: p.companionNames || [],
-    tableNumber: p.tableNumber, confirmed: confirmedMap.has(p.id), canceled: canceledMap.has(p.id), checkedIn: confirmedMap.get(p.id)?.checkedIn || false,
-    checkedInAt: confirmedMap.get(p.id)?.checkedInAt || '',
-    email: confirmedMap.get(p.id)?.email || '', dietary: confirmedMap.get(p.id)?.dietary || '',
-    message: confirmedMap.get(p.id)?.message || '', songs: confirmedMap.get(p.id)?.songs || '',
-    confirmedAt: confirmedMap.get(p.id)?.confirmedAt || '',
-  }));
+  const result: CombinedGuest[] = pre.map((p) => {
+    const c = confirmedMap.get(p.id);
+    const isCanceled = canceledMap.has(p.id);
+    const invitedCount = p.guests + 1;
+
+    return {
+      id: p.id, name: p.name, guests: p.guests, companionNames: p.companionNames || [],
+      tableNumber: p.tableNumber, confirmed: !!c, canceled: isCanceled,
+      invitedCount,
+      attendingCount: c ? c.guests + 1 : 0,
+      canceledCount: isCanceled ? invitedCount : 0,
+      rsvpStatus: isCanceled ? 'cancelo' : c ? 'confirmo' : 'pendiente',
+      checkedIn: c?.checkedIn || false,
+      checkedInAt: c?.checkedInAt || '',
+      email: c?.email || '', dietary: c?.dietary || '',
+      message: c?.message || '', songs: c?.songs || '',
+      confirmedAt: c?.confirmedAt || '',
+    };
+  });
 
   for (const c of activeConfirmed) {
     if (!pre.find(p => p.id === c.id)) {
-      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: true, canceled: false, checkedIn: !!c.checkedIn, checkedInAt: c.checkedInAt || '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
+      const attendingCount = c.guests + 1;
+      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: true, canceled: false, invitedCount: attendingCount, attendingCount, canceledCount: 0, rsvpStatus: 'confirmo', checkedIn: !!c.checkedIn, checkedInAt: c.checkedInAt || '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
     }
   }
 
   for (const c of canceled) {
     if (!pre.find(p => p.id === c.id)) {
-      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: false, canceled: true, checkedIn: false, checkedInAt: '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
+      const canceledCount = c.guests + 1;
+      result.push({ id: c.id, name: c.name, guests: c.guests, companionNames: [], tableNumber: c.tableNumber, confirmed: false, canceled: true, invitedCount: canceledCount, attendingCount: 0, canceledCount, rsvpStatus: 'cancelo', checkedIn: false, checkedInAt: '', email: c.email, dietary: c.dietary, message: c.message, songs: c.songs, confirmedAt: c.confirmedAt });
     }
   }
 

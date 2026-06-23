@@ -90,6 +90,10 @@ export interface CombinedGuest {
   tableNumber: number;
   confirmed: boolean;
   canceled: boolean;
+  invitedCount: number;
+  attendingCount: number;
+  canceledCount: number;
+  rsvpStatus: 'pendiente' | 'confirmo' | 'cancelo';
   checkedIn: boolean;
   checkedInAt: string;
   email?: string;

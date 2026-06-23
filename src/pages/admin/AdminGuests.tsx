@@ -5,23 +5,66 @@ import {
   deleteConfirmedGuest,
   deletePreGuest,
   getAllGuests,
-  getPreGuests,
   getTables,
   saveConfirmedGuest,
   savePreGuest,
   updatePreGuest,
 } from '../../data';
-import type { PreGuest, TableData } from '../../types';
+import type { CombinedGuest, TableData } from '../../types';
 
-type AdminGuest = PreGuest & { canceled?: boolean };
+type GuestStatusFilter = 'all' | 'invitado' | 'pendiente' | 'confirmo' | 'cancelo';
+type ResponseStatus = 'pendiente' | 'confirmo' | 'cancelo';
+
+const statusOptions: { value: GuestStatusFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'invitado', label: 'Invitado' },
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'confirmo', label: 'Confirmó' },
+  { value: 'cancelo', label: 'Canceló' },
+];
+
+function getResponseStatus(guest: CombinedGuest): ResponseStatus {
+  if (guest.rsvpStatus) return guest.rsvpStatus;
+  if (guest.canceled) return 'cancelo';
+  if (guest.confirmed) return 'confirmo';
+  return 'pendiente';
+}
+
+function getInvitedCount(guest: CombinedGuest) {
+  return guest.invitedCount ?? guest.guests + 1;
+}
+
+function getAttendingCount(guest: CombinedGuest) {
+  return guest.attendingCount ?? (guest.confirmed ? guest.guests + 1 : 0);
+}
+
+function getCanceledCount(guest: CombinedGuest) {
+  return guest.canceledCount ?? (guest.canceled ? getInvitedCount(guest) : 0);
+}
+
+function peopleLabel(count: number) {
+  return `${count} ${count === 1 ? 'persona' : 'personas'}`;
+}
+
+function statusLabel(status: ResponseStatus) {
+  if (status === 'confirmo') return 'Confirmó';
+  if (status === 'cancelo') return 'Canceló';
+  return 'Pendiente';
+}
+
+function statusClass(status: ResponseStatus) {
+  if (status === 'confirmo') return 'bg-olive-100 text-olive-700';
+  if (status === 'cancelo') return 'bg-rose-50 text-rose-500';
+  return 'bg-amber-50 text-amber-600';
+}
 
 export function AdminGuests() {
-  const [preGuests, setPreGuests] = useState<AdminGuest[]>([]);
+  const [guests, setGuests] = useState<CombinedGuest[]>([]);
   const [tables, setTables] = useState<TableData[]>([]);
-  const [confirmedPeople, setConfirmedPeople] = useState(0);
-  const [canceledPeople, setCanceledPeople] = useState(0);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<GuestStatusFilter>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formName, setFormName] = useState('');
   const [formGuests, setFormGuests] = useState('0');
@@ -30,21 +73,53 @@ export function AdminGuests() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const guestGroups = useMemo(() => {
+    const confirmed = guests.filter((guest) => getResponseStatus(guest) === 'confirmo');
+    const canceled = guests.filter((guest) => getResponseStatus(guest) === 'cancelo');
+    const pending = guests.filter((guest) => getResponseStatus(guest) === 'pendiente');
+
+    return { confirmed, canceled, pending };
+  }, [guests]);
+
+  const totals = useMemo(() => {
+    const invitedPeople = guests.reduce((sum, guest) => sum + getInvitedCount(guest), 0);
+    const attendingPeople = guestGroups.confirmed.reduce((sum, guest) => sum + getAttendingCount(guest), 0);
+    const canceledPeople = guestGroups.canceled.reduce((sum, guest) => sum + getCanceledCount(guest), 0);
+    const pendingPeople = guestGroups.pending.reduce((sum, guest) => sum + getInvitedCount(guest), 0);
+
+    return {
+      invitedGroups: guests.length,
+      invitedPeople,
+      attendingGroups: guestGroups.confirmed.length,
+      attendingPeople,
+      canceledGroups: guestGroups.canceled.length,
+      canceledPeople,
+      pendingGroups: guestGroups.pending.length,
+      pendingPeople,
+    };
+  }, [guestGroups, guests]);
+
   const filteredGuests = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return preGuests;
 
-    return preGuests.filter((guest) => {
+    return guests.filter((guest) => {
+      const status = getResponseStatus(guest);
+      const matchesStatus = statusFilter === 'all' || statusFilter === 'invitado' || status === statusFilter;
+      if (!matchesStatus) return false;
+      if (!query) return true;
+
       const searchable = [
         guest.name,
         String(guest.tableNumber || ''),
-        guest.canceled ? 'cancelo cancelado' : guest.confirmed ? 'confirmo confirmado' : 'invitado pendiente',
+        'invitado',
+        statusLabel(status),
+        status,
         ...(guest.companionNames || []),
       ].join(' ').toLowerCase();
 
       return searchable.includes(query);
     });
-  }, [preGuests, search]);
+  }, [guests, search, statusFilter]);
 
   useEffect(() => {
     if (!localStorage.getItem('wedding-admin')) {
@@ -56,15 +131,9 @@ export function AdminGuests() {
   }, [navigate]);
 
   async function refresh() {
-    const [guests, allGuests, tableList] = await Promise.all([getPreGuests(), getAllGuests(), getTables()]);
-    const statusMap = new Map(allGuests.map((guest) => [guest.id, guest]));
-    setPreGuests(guests.map((guest) => {
-      const status = statusMap.get(guest.id);
-      return { ...guest, confirmed: !!status?.confirmed, canceled: !!status?.canceled };
-    }));
+    const [allGuests, tableList] = await Promise.all([getAllGuests(), getTables()]);
+    setGuests(allGuests);
     setTables(tableList);
-    setConfirmedPeople(allGuests.filter((guest) => guest.confirmed).reduce((sum, guest) => sum + guest.guests + 1, 0));
-    setCanceledPeople(allGuests.filter((guest) => guest.canceled).reduce((sum, guest) => sum + guest.guests + 1, 0));
   }
 
   function resetFormFields() {
@@ -127,7 +196,7 @@ export function AdminGuests() {
     }
   }
 
-  function handleEdit(guest: PreGuest) {
+  function handleEdit(guest: CombinedGuest) {
     setFormName(guest.name);
     setFormGuests(String(guest.guests));
     setFormCompanions(guest.companionNames || []);
@@ -143,7 +212,7 @@ export function AdminGuests() {
     await refresh();
   }
 
-  async function toggleConfirmed(guest: AdminGuest) {
+  async function toggleConfirmed(guest: CombinedGuest) {
     if (guest.confirmed) {
       await deleteConfirmedGuest(guest.id);
       await updatePreGuest(guest.id, { confirmed: false });
@@ -167,6 +236,35 @@ export function AdminGuests() {
     await refresh();
   }
 
+  function SummaryList({ title, guests: items, emptyText }: { title: string; guests: CombinedGuest[]; emptyText: string }) {
+    return (
+      <div className="rounded-sm border border-olive-100 bg-white">
+        <div className="border-b border-olive-50 px-4 py-3">
+          <h4 className="text-[10px] uppercase tracking-[0.14em] text-slate-500">{title}</h4>
+        </div>
+        {items.length === 0 ? (
+          <p className="p-4 text-xs text-slate-300">{emptyText}</p>
+        ) : (
+          <div className="max-h-56 divide-y divide-olive-50 overflow-y-auto">
+            {items.map((guest) => (
+              <div key={guest.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-700">{guest.name}</p>
+                  <p className="text-[10px] text-slate-400">
+                    {peopleLabel(getInvitedCount(guest))} invitados{guest.tableNumber > 0 && ` · Mesa ${guest.tableNumber}`}
+                  </p>
+                </div>
+                <span className={`shrink-0 rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${statusClass(getResponseStatus(guest))}`}>
+                  {getResponseStatus(guest) === 'confirmo' ? peopleLabel(getAttendingCount(guest)) : statusLabel(getResponseStatus(guest))}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-cream">
       <header className="flex items-center justify-between border-b border-olive-100 bg-white px-4 py-4 shadow-sm">
@@ -177,20 +275,50 @@ export function AdminGuests() {
           <Link to="/admin/tables" className="text-[10px] uppercase tracking-[0.1em] text-slate-400 transition-colors hover:text-olive-600">
             Mesas
           </Link>
-          <span className="text-xs text-slate-400">{preGuests.length} invitados · {confirmedPeople} confirmaron · {canceledPeople} cancelaron</span>
+          <span className="hidden text-xs text-slate-400 md:inline">
+            {totals.invitedGroups} invitados · {peopleLabel(totals.attendingPeople)} confirmaron · {peopleLabel(totals.canceledPeople)} cancelaron
+          </span>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl p-4 md:p-8">
+      <div className="mx-auto max-w-7xl p-4 md:p-8">
+        <div className="mb-6 grid gap-3 md:grid-cols-4">
+          <div className="rounded-sm border border-olive-100 bg-white p-4 text-center shadow-sm">
+            <p className="font-serif text-3xl text-slate-700">{totals.invitedPeople}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Personas invitadas</p>
+          </div>
+          <div className="rounded-sm border border-olive-100 bg-white p-4 text-center shadow-sm">
+            <p className="font-serif text-3xl text-olive-600">{totals.attendingPeople}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Sí asistirán</p>
+          </div>
+          <div className="rounded-sm border border-olive-100 bg-white p-4 text-center shadow-sm">
+            <p className="font-serif text-3xl text-rose-500">{totals.canceledPeople}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Cancelaron</p>
+          </div>
+          <div className="rounded-sm border border-olive-100 bg-white p-4 text-center shadow-sm">
+            <p className="font-serif text-3xl text-amber-600">{totals.pendingPeople}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Pendientes</p>
+          </div>
+        </div>
+
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-xs uppercase tracking-[0.15em] text-slate-500">Lista de invitados</h2>
-            <p className="mt-1 text-xs text-slate-400">{filteredGuests.length} visibles de {preGuests.length}</p>
+            <p className="mt-1 text-xs text-slate-400">{filteredGuests.length} visibles de {guests.length}</p>
           </div>
-          <Button variant="primary" size="sm" onClick={openAddModal}>+ Agregar invitado</Button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setIsSummaryOpen(true)}
+              className="rounded-sm border border-olive-200 px-4 py-2 text-xs uppercase tracking-[0.12em] text-olive-700 transition-colors hover:bg-white"
+            >
+              Ver resumen
+            </button>
+            <Button variant="primary" size="sm" onClick={openAddModal}>+ Agregar invitado</Button>
+          </div>
         </div>
 
-        <div className="mb-4 rounded-sm border border-olive-100 bg-white p-3 shadow-sm">
+        <div className="mb-4 grid gap-3 rounded-sm border border-olive-100 bg-white p-3 shadow-sm md:grid-cols-[1fr_auto] md:items-center">
           <input
             type="search"
             value={search}
@@ -198,10 +326,24 @@ export function AdminGuests() {
             className="w-full rounded-sm border border-olive-200 bg-olive-50/40 px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors placeholder:text-slate-300 focus:border-olive-500"
             placeholder="Buscar por nombre, acompañante, mesa o estado"
           />
+          <div className="flex flex-wrap gap-2">
+            {statusOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setStatusFilter(option.value)}
+                className={`rounded-sm px-3 py-2 text-[10px] uppercase tracking-[0.1em] transition-colors ${
+                  statusFilter === option.value ? 'bg-olive-700 text-cream' : 'bg-olive-50 text-olive-700 hover:bg-olive-100'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-sm border border-olive-100 bg-white shadow-sm">
-          {preGuests.length === 0 ? (
+          {guests.length === 0 ? (
             <div className="p-12 text-center">
               <p className="mb-2 text-xs uppercase tracking-[0.15em] text-slate-300">No hay invitados</p>
               <button onClick={openAddModal} className="text-xs text-olive-600 hover:underline">Agregar primer invitado</button>
@@ -216,7 +358,8 @@ export function AdminGuests() {
                 <thead>
                   <tr className="border-b border-olive-50">
                     <th className="p-3 text-left text-[9px] uppercase tracking-[0.1em] text-slate-400">Nombre</th>
-                    <th className="p-3 text-left text-[9px] uppercase tracking-[0.1em] text-slate-400">Acompañantes</th>
+                    <th className="p-3 text-left text-[9px] uppercase tracking-[0.1em] text-slate-400">Invitados</th>
+                    <th className="p-3 text-left text-[9px] uppercase tracking-[0.1em] text-slate-400">Asistencia</th>
                     <th className="p-3 text-center text-[9px] uppercase tracking-[0.1em] text-slate-400">Mesa</th>
                     <th className="p-3 text-center text-[9px] uppercase tracking-[0.1em] text-slate-400">Estado</th>
                     <th className="p-3 text-center text-[9px] uppercase tracking-[0.1em] text-slate-400">Acciones</th>
@@ -225,6 +368,7 @@ export function AdminGuests() {
                 <tbody>
                   {filteredGuests.map((guest) => {
                     const companions = guest.companionNames?.filter(Boolean) || [];
+                    const status = getResponseStatus(guest);
 
                     return (
                       <tr key={guest.id} className="border-b border-olive-50 hover:bg-olive-50/30">
@@ -232,17 +376,34 @@ export function AdminGuests() {
                           <p className="text-sm font-medium text-slate-700">{guest.name}</p>
                           {companions.length > 0 && <p className="mt-0.5 text-[10px] text-slate-400">{companions.join(', ')}</p>}
                         </td>
-                        <td className="p-3 text-sm text-slate-600">{guest.guests > 0 ? `${guest.guests + 1} pers.` : 'Solo'}</td>
+                        <td className="p-3">
+                          <p className="text-sm text-slate-600">{peopleLabel(getInvitedCount(guest))}</p>
+                          <p className="mt-0.5 text-[10px] text-slate-400">{guest.guests > 0 ? `${guest.guests} acompañante${guest.guests > 1 ? 's' : ''}` : 'Sin acompañantes'}</p>
+                        </td>
+                        <td className="p-3">
+                          {status === 'confirmo' ? (
+                            <p className="text-sm font-medium text-olive-700">{peopleLabel(getAttendingCount(guest))} sí van</p>
+                          ) : status === 'cancelo' ? (
+                            <p className="text-sm font-medium text-rose-500">{peopleLabel(getCanceledCount(guest))} cancelaron</p>
+                          ) : (
+                            <p className="text-sm font-medium text-amber-600">Pendiente</p>
+                          )}
+                          {guest.confirmedAt && <p className="mt-0.5 text-[10px] text-slate-400">{new Date(guest.confirmedAt).toLocaleDateString('es-MX')}</p>}
+                        </td>
                         <td className="p-3 text-center">
                           <span className="text-sm font-medium text-olive-600">{guest.tableNumber > 0 ? `Mesa ${guest.tableNumber}` : '-'}</span>
                         </td>
                         <td className="p-3 text-center">
-                          <button
-                            onClick={() => toggleConfirmed(guest)}
-                            className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.canceled ? 'bg-rose-50 text-rose-500' : guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}
-                          >
-                            {guest.canceled ? 'Canceló' : guest.confirmed ? 'Confirmó' : 'Invitado'}
-                          </button>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="rounded-sm bg-slate-100 px-2 py-1 text-[9px] uppercase tracking-[0.1em] text-slate-500">Invitado</span>
+                            <button
+                              onClick={() => toggleConfirmed(guest)}
+                              className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${statusClass(status)}`}
+                              title={guest.confirmed ? 'Marcar como pendiente' : 'Marcar como confirmado'}
+                            >
+                              {statusLabel(status)}
+                            </button>
+                          </div>
                         </td>
                         <td className="p-3 text-center">
                           <div className="flex justify-center gap-2">
@@ -259,6 +420,51 @@ export function AdminGuests() {
           )}
         </div>
       </div>
+
+      {isSummaryOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+          <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-sm border border-olive-100 bg-cream p-5 shadow-2xl md:p-6">
+            <div className="mb-5 flex items-start justify-between gap-4 border-b border-olive-100 pb-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400">Resumen de asistencia</p>
+                <h3 className="mt-1 font-serif text-2xl text-slate-700">Invitados y confirmaciones</h3>
+              </div>
+              <button type="button" onClick={() => setIsSummaryOpen(false)} className="rounded-sm px-3 py-1 text-xl leading-none text-slate-400 transition-colors hover:bg-white hover:text-slate-700">
+                &times;
+              </button>
+            </div>
+
+            <div className="mb-5 grid gap-3 md:grid-cols-4">
+              <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
+                <p className="font-serif text-3xl text-slate-700">{totals.invitedPeople}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-400">Personas invitadas</p>
+                <p className="mt-1 text-[10px] text-slate-300">{totals.invitedGroups} grupos</p>
+              </div>
+              <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
+                <p className="font-serif text-3xl text-olive-600">{totals.attendingPeople}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-400">Sí van</p>
+                <p className="mt-1 text-[10px] text-slate-300">{totals.attendingGroups} grupos</p>
+              </div>
+              <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
+                <p className="font-serif text-3xl text-rose-500">{totals.canceledPeople}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-400">Cancelaron</p>
+                <p className="mt-1 text-[10px] text-slate-300">{totals.canceledGroups} grupos</p>
+              </div>
+              <div className="rounded-sm border border-olive-100 bg-white p-4 text-center">
+                <p className="font-serif text-3xl text-amber-600">{totals.pendingPeople}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-slate-400">Pendientes</p>
+                <p className="mt-1 text-[10px] text-slate-300">{totals.pendingGroups} grupos</p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              <SummaryList title="Dijeron que sí van" guests={guestGroups.confirmed} emptyText="Aún no hay confirmaciones." />
+              <SummaryList title="Cancelaron asistencia" guests={guestGroups.canceled} emptyText="Nadie ha cancelado." />
+              <SummaryList title="Pendientes" guests={guestGroups.pending} emptyText="No hay pendientes." />
+            </div>
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">

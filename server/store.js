@@ -147,14 +147,20 @@ function combineGuests(preGuests, confirmed) {
   const canceledMap = new Map(canceled.map(c => [c.id, c]));
   const result = preGuests.map(g => {
     const c = confirmedMap.get(g.id);
+    const isCanceled = canceledMap.has(g.id);
+    const invitedCount = g.guests + 1;
     return {
       id: g.id,
       name: g.name,
       guests: g.guests,
       companionNames: g.companionNames || [],
       tableNumber: g.tableNumber,
-      confirmed: confirmedMap.has(g.id),
-      canceled: canceledMap.has(g.id),
+      confirmed: !!c,
+      canceled: isCanceled,
+      invitedCount,
+      attendingCount: c ? c.guests + 1 : 0,
+      canceledCount: isCanceled ? invitedCount : 0,
+      rsvpStatus: isCanceled ? 'cancelo' : c ? 'confirmo' : 'pendiente',
       checkedIn: c ? !!c.checkedIn : false,
       checkedInAt: c?.checkedInAt || '',
       email: c?.email || '',
@@ -167,6 +173,7 @@ function combineGuests(preGuests, confirmed) {
 
   for (const c of activeConfirmed) {
     if (!preGuests.find(p => p.id === c.id)) {
+      const attendingCount = c.guests + 1;
       result.push({
         id: c.id,
         name: c.name,
@@ -175,6 +182,10 @@ function combineGuests(preGuests, confirmed) {
         tableNumber: c.tableNumber,
         confirmed: true,
         canceled: false,
+        invitedCount: attendingCount,
+        attendingCount,
+        canceledCount: 0,
+        rsvpStatus: 'confirmo',
         checkedIn: !!c.checkedIn,
         checkedInAt: c.checkedInAt || '',
         email: c.email,
@@ -188,6 +199,7 @@ function combineGuests(preGuests, confirmed) {
 
   for (const c of canceled) {
     if (!preGuests.find(p => p.id === c.id)) {
+      const canceledCount = c.guests + 1;
       result.push({
         id: c.id,
         name: c.name,
@@ -196,6 +208,10 @@ function combineGuests(preGuests, confirmed) {
         tableNumber: c.tableNumber,
         confirmed: false,
         canceled: true,
+        invitedCount: canceledCount,
+        attendingCount: 0,
+        canceledCount,
+        rsvpStatus: 'cancelo',
         checkedIn: false,
         checkedInAt: '',
         email: c.email,

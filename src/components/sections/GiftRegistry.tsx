@@ -13,6 +13,7 @@ const CARD_NUMBER = '5101 2597 0665 2251';
 export function GiftRegistry() {
   const sectionRef = useRef<HTMLElement>(null);
   const gift = GIFT_REGISTRY[0];
+  const amazonGift = GIFT_REGISTRY[1];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -37,13 +38,23 @@ export function GiftRegistry() {
           aquí tienes algunas ideas.
         </p>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="grid gap-6 max-w-5xl mx-auto md:grid-cols-3">
           <GlassCard className="gift-card p-8 text-center group hover:-translate-y-1 transition-transform duration-300">
             <div className="text-5xl mb-4 text-gold-500">&#127873;</div>
             <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">Liverpool</p>
             <h3 className="font-serif text-3xl text-slate-700 mb-3">Mesa de regalos</h3>
             <p className="text-slate-500/70 text-base leading-relaxed mb-6">{gift.description}</p>
             <a href={gift.link} target="_blank" rel="noopener noreferrer">
+              <Button variant="primary" size="lg">Ver lista</Button>
+            </a>
+          </GlassCard>
+
+          <GlassCard className="gift-card p-8 text-center group hover:-translate-y-1 transition-transform duration-300">
+            <div className="text-5xl mb-4 text-gold-500">&#127873;</div>
+            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-slate-400">Amazon</p>
+            <h3 className="font-serif text-3xl text-slate-700 mb-3">Mesa de regalos</h3>
+            <p className="text-slate-500/70 text-base leading-relaxed mb-6">{amazonGift.description}</p>
+            <a href={amazonGift.link} target="_blank" rel="noopener noreferrer">
               <Button variant="primary" size="lg">Ver lista</Button>
             </a>
           </GlassCard>

@@ -102,6 +102,7 @@ function CountdownStrip() {
 export function EditorialInvitation() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const gift = GIFT_REGISTRY[0];
+  const amazonGift = GIFT_REGISTRY[1];
   const [activeImage, setActiveImage] = useState(0);
   const [activeFrame, setActiveFrame] = useState(0);
   const previousImage = (activeImage - 1 + galleryImages.length) % galleryImages.length;
@@ -483,13 +484,24 @@ export function EditorialInvitation() {
         <div className="relative z-10">
           <SectionHeading eyebrow="Mesa" title="Regalos" />
         </div>
-        <div className="gift-grid relative z-10 mx-auto grid max-w-5xl gap-5 md:grid-cols-2">
+        <div className="gift-grid relative z-10 mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
           <div className="gift-panel scroll-reveal border border-olive-100 bg-white/70 p-8 text-center">
             <Gift className="mx-auto mb-5 h-8 w-8 text-olive-700" aria-hidden="true" />
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-olive-700/70">Liverpool</p>
             <h3 className="font-serif text-3xl text-olive-900 md:text-4xl">Mesa de regalos</h3>
             <p className="mx-auto mt-4 max-w-md text-base leading-8 text-olive-900/75 md:text-lg">{gift.description}</p>
             <a href={gift.link} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center justify-center gap-2 bg-olive-700 px-7 py-3.5 text-sm uppercase tracking-[0.16em] text-cream transition hover:bg-olive-800">
+              Ver lista
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+
+          <div className="gift-panel scroll-reveal border border-olive-100 bg-white/70 p-8 text-center">
+            <Gift className="mx-auto mb-5 h-8 w-8 text-olive-700" aria-hidden="true" />
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-olive-700/70">Amazon</p>
+            <h3 className="font-serif text-3xl text-olive-900 md:text-4xl">Mesa de regalos</h3>
+            <p className="mx-auto mt-4 max-w-md text-base leading-8 text-olive-900/75 md:text-lg">{amazonGift.description}</p>
+            <a href={amazonGift.link} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center justify-center gap-2 bg-olive-700 px-7 py-3.5 text-sm uppercase tracking-[0.16em] text-cream transition hover:bg-olive-800">
               Ver lista
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>

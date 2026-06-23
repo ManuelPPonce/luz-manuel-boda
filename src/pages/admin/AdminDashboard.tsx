@@ -3,6 +3,24 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getAllGuests, getTables } from '../../data';
 import type { CombinedGuest, TableData } from '../../types';
 
+function getInvitedCount(guest: CombinedGuest) {
+  return guest.invitedCount ?? guest.guests + 1;
+}
+
+function getAttendingCount(guest: CombinedGuest) {
+  return guest.attendingCount ?? (guest.confirmed ? guest.guests + 1 : 0);
+}
+
+function getCanceledCount(guest: CombinedGuest) {
+  return guest.canceledCount ?? (guest.canceled ? getInvitedCount(guest) : 0);
+}
+
+function getGuestStatus(guest: CombinedGuest) {
+  if (guest.canceled || guest.rsvpStatus === 'cancelo') return 'Canceló';
+  if (guest.confirmed || guest.rsvpStatus === 'confirmo') return 'Confirmó';
+  return 'Pendiente';
+}
+
 export function AdminDashboard() {
   const [guests, setGuests] = useState<CombinedGuest[]>([]);
   const [tables, setTables] = useState<TableData[]>([]);
@@ -21,10 +39,10 @@ export function AdminDashboard() {
   }, [navigate]);
 
   const total = guests.length;
-  const totalPeople = guests.reduce((sum, guest) => sum + guest.guests + 1, 0);
-  const confirmedPeople = guests.filter((guest) => guest.confirmed).reduce((sum, guest) => sum + guest.guests + 1, 0);
-  const canceledPeople = guests.filter((guest) => guest.canceled).reduce((sum, guest) => sum + guest.guests + 1, 0);
-  const checkedInPeople = guests.filter((guest) => guest.checkedIn).reduce((sum, guest) => sum + guest.guests + 1, 0);
+  const totalPeople = guests.reduce((sum, guest) => sum + getInvitedCount(guest), 0);
+  const confirmedPeople = guests.filter((guest) => guest.confirmed).reduce((sum, guest) => sum + getAttendingCount(guest), 0);
+  const canceledPeople = guests.filter((guest) => guest.canceled).reduce((sum, guest) => sum + getCanceledCount(guest), 0);
+  const checkedInPeople = guests.filter((guest) => guest.checkedIn).reduce((sum, guest) => sum + getAttendingCount(guest), 0);
   const tableCount = tables.length;
   const allSongs = guests.filter((guest) => guest.songs);
 
@@ -94,14 +112,16 @@ export function AdminDashboard() {
                 <div key={guest.id} className="flex items-center justify-between p-3 hover:bg-olive-50/30 md:p-4">
                   <div>
                     <p className="text-sm font-medium text-slate-700">{guest.name}</p>
-                    <p className="text-[10px] text-slate-400">{guest.guests > 0 ? `${guest.guests + 1} personas` : 'Solo'}{guest.tableNumber > 0 && ` · Mesa ${guest.tableNumber}`}</p>
+                    <p className="text-[10px] text-slate-400">
+                      {getInvitedCount(guest)} invitados{guest.confirmed && ` · ${getAttendingCount(guest)} asistirán`}{guest.tableNumber > 0 && ` · Mesa ${guest.tableNumber}`}
+                    </p>
                   </div>
                   <div className="flex gap-2">
-                    <span className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.canceled ? 'bg-rose-50 text-rose-500' : guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>
-                      {guest.canceled ? 'Canceló' : guest.confirmed ? 'Confirmó' : 'Invitado'}
+                    <span className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.canceled ? 'bg-rose-50 text-rose-500' : guest.confirmed ? 'bg-olive-100 text-olive-700' : 'bg-amber-50 text-amber-600'}`}>
+                      {getGuestStatus(guest)}
                     </span>
                     <span className={`rounded-sm px-2 py-1 text-[9px] uppercase tracking-[0.1em] ${guest.checkedIn ? 'bg-olive-100 text-olive-700' : 'bg-slate-100 text-slate-400'}`}>
-                      {guest.checkedIn ? 'Llegó' : 'Pendiente'}
+                      {guest.checkedIn ? 'Llegó' : 'Check-in pendiente'}
                     </span>
                   </div>
                 </div>

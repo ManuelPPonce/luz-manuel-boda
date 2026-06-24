@@ -46,7 +46,7 @@ export function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden bg-[#d8d7d3]"
+      className="relative min-h-[100svh] overflow-hidden bg-[#d8d7d3]"
     >
       <picture className="absolute inset-0">
         <source media="(min-width: 768px)" srcSet="/images/hero.webp" />
@@ -61,7 +61,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(17,21,19,0.18)_58%,rgba(17,21,19,0.42)_100%)]" />
       <div className="paper-rip absolute bottom-[-1px] left-0 right-0 h-20 bg-[#f6f2ec]" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-end px-5 pb-24 pt-28 text-center text-cream">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-5xl flex-col items-center justify-end px-5 pb-28 pt-24 text-center text-cream md:pb-36 md:pt-28">
         <p className="hero-title-glow mb-5 font-serif text-5xl font-light uppercase leading-[0.9] tracking-[0.08em] md:text-7xl" aria-label="Wedding Day">
           <AnimatedLetters text="Wedding" />
           <AnimatedLetters text="Day" start={7} />
@@ -102,9 +102,11 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="hero-scroll absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 animate-float flex-col items-center gap-1 text-olive-700/70">
-        <span className="text-[9px] uppercase tracking-[0.22em]">Desliza</span>
-        <ChevronDown className="h-6 w-6" aria-hidden="true" />
+      <div className="hero-scroll absolute inset-x-0 bottom-6 z-10 flex animate-float justify-center text-olive-700/75 md:bottom-7">
+        <div className="flex flex-col items-center gap-1 text-center">
+          <span className="text-[9px] uppercase tracking-[0.22em]">Desliza</span>
+          <ChevronDown className="h-6 w-6" aria-hidden="true" />
+        </div>
       </div>
     </section>
   );

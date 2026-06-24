@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import { CalendarDays, ChevronDown, MapPin, Send } from 'lucide-react';
+import { CalendarDays, ChevronDown, Clock3, MapPin, Send } from 'lucide-react';
 
 function AnimatedLetters({ text, start = 0 }: { text: string; start?: number }) {
   let letterIndex = start;
@@ -33,8 +33,10 @@ export function Hero() {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
       tl.fromTo('.hero-date', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, delay: 1.3 })
+        .fromTo('.hero-time', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.45')
         .fromTo('.hero-location', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.35')
-        .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.3');
+        .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.3')
+        .fromTo('.hero-scroll', { opacity: 0, y: -4 }, { opacity: 1, y: 0, duration: 0.8 }, '-=0.15');
     }, containerRef);
 
     return () => ctx.revert();
@@ -77,6 +79,11 @@ export function Hero() {
           </p>
         </div>
 
+        <p className="hero-time mt-3 flex items-center justify-center gap-2 text-xs font-light uppercase tracking-[0.2em] text-cream/95 drop-shadow-lg md:text-sm">
+          <Clock3 className="h-4 w-4" aria-hidden="true" />
+          7:00 PM
+        </p>
+
         <p className="hero-location mt-4 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.16em] text-cream/90 drop-shadow-lg md:text-sm">
           <MapPin className="h-4 w-4" aria-hidden="true" />
           Holiday Inn Campeche
@@ -95,7 +102,8 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 animate-float text-olive-700/70">
+      <div className="hero-scroll absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 animate-float flex-col items-center gap-1 text-olive-700/70">
+        <span className="text-[9px] uppercase tracking-[0.22em]">Desliza</span>
         <ChevronDown className="h-6 w-6" aria-hidden="true" />
       </div>
     </section>

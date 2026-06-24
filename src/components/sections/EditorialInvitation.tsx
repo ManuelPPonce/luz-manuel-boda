@@ -335,7 +335,7 @@ export function EditorialInvitation() {
 
       <section className="scroll-section paper-section paper-section-sage px-5 py-20 md:px-8 md:py-28">
         <div className="relative z-10">
-          <SectionHeading title="Timing" light />
+          <SectionHeading title="Itinerario" light />
         </div>
         <p className="scroll-reveal relative z-10 mx-auto -mt-2 mb-12 max-w-2xl text-center text-sm leading-7 text-cream">
           Una noche pensada para celebrar con calma, emoción y muchos recuerdos.

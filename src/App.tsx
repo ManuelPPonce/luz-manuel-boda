@@ -142,7 +142,7 @@ function MainContent() {
           <MusicPlayer audioRef={audioRef} />
         </>
       )}
-      <audio ref={audioRef} src="/music/playlist.mp3?v=3" loop preload="auto" />
+      <audio ref={audioRef} src="/music/playlist-v2.mp3" loop preload="auto" />
     </>
   );
 }

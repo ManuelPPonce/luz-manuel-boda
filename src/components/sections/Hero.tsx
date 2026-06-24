@@ -102,7 +102,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="hero-scroll absolute inset-x-0 bottom-6 z-10 flex animate-float justify-center text-olive-700/75 md:bottom-7">
+      <div className="hero-scroll absolute inset-x-0 bottom-6 z-10 flex animate-float justify-center text-cream/90 drop-shadow-lg md:bottom-7">
         <div className="flex flex-col items-center gap-1 text-center">
           <span className="text-[9px] uppercase tracking-[0.22em]">Desliza</span>
           <ChevronDown className="h-6 w-6" aria-hidden="true" />
